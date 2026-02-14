@@ -53,3 +53,21 @@ body {
 .hint-loop {
   animation: hintPulse 6s ease-in-out infinite;
 }
+
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+}
+
+.safe-inset {
+  padding-top: max(1rem, var(--safe-top));
+  padding-right: max(1rem, var(--safe-right));
+  padding-bottom: max(1rem, var(--safe-bottom));
+  padding-left: max(1rem, var(--safe-left));
+}
+
+.max-h-safe {
+  max-height: calc(100svh - var(--safe-top) - var(--safe-bottom) - 2rem);
+}

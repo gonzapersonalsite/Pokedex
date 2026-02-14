@@ -48,35 +48,6 @@ export function PokedexPage() {
     };
   }, []);
 
-  const [soundEnabled, setSoundEnabled] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    try {
-      return localStorage.getItem('pokedex-sound') === '1';
-    } catch {
-      return false;
-    }
-  });
-
-  const enableSound = async () => {
-    try {
-      const AudioCtx: any = (window as any).AudioContext || (window as any).webkitAudioContext;
-      const ctx = new AudioCtx();
-      (window as any).__pokedexAudioContext = ctx;
-      const buffer = ctx.createBuffer(1, 1, 22050);
-      const source = ctx.createBufferSource();
-      source.buffer = buffer;
-      source.connect(ctx.destination);
-      source.start(0);
-      await ctx.resume();
-      setSoundEnabled(true);
-      try {
-        localStorage.setItem('pokedex-sound', '1');
-      } catch {}
-      toast({ variant: 'success', title: 'Sound enabled', message: 'Audio is now available.' });
-    } catch {
-      toast({ variant: 'error', title: 'Unable to enable sound', message: 'Your browser blocked audio without interaction.' });
-    }
-  };
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans">
@@ -118,17 +89,6 @@ export function PokedexPage() {
                   <MoonIcon className="w-6 h-6" />
                 )}
               </Button>
-              {!soundEnabled && (
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="shrink-0 whitespace-nowrap"
-                  onClick={enableSound}
-                  aria-label="Enable sound"
-                >
-                  Enable sound
-                </Button>
-              )}
               {canInstall && (
                 <Button
                   variant="secondary"

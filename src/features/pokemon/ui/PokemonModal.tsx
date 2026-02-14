@@ -116,7 +116,7 @@ export function PokemonModal({
         >
           <div className="fixed inset-0 bg-black/60" aria-hidden />
         </TransitionChild>
-        <div className="fixed inset-0 flex items-center justify-center p-4">
+        <div className="fixed inset-0 flex items-center justify-center p-4 safe-inset">
           {/* 2. TRANSICIÓN DE LA POKÉDEX MÁS LENTA Y DINÁMICA */}
           <TransitionChild
             as={Fragment}
@@ -145,10 +145,10 @@ export function PokemonModal({
                     <div className="w-4 h-4 bg-green-500 rounded-full border border-black/30 shadow-[0_0_5px_green]" />
                   </div>
                 </div>
-                <div className="bg-[#dedede] p-4 sm:p-6 pb-10 rounded-xl rounded-bl-[40px] border-b-4 border-r-4 border-gray-400 shadow-inner">
+                <div className="bg-[#dedede] p-4 sm:p-6 pb-10 rounded-xl rounded-bl-[40px] border-b-4 border-r-4 border-gray-400 shadow-inner flex flex-col min-h-0">
                   <DialogPanel
                     ref={screenRef}
-                    className="relative mx-auto w-full max-h-[65vh] sm:max-h-[70vh] overflow-y-auto rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border-2 border-black/20 shadow-[inset_0_0_20px_rgba(0,0,0,0.6)]"
+                    className="relative mx-auto w-full flex-1 min-h-0 max-h-[58svh] sm:max-h-safe overflow-y-auto overscroll-contain rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border-2 border-black/20 shadow-[inset_0_0_20px_rgba(0,0,0,0.6)]"
                   >
                     {scan && (
                       <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -167,7 +167,7 @@ export function PokemonModal({
                             const prevId = Math.max(1, pokemon.id - 1);
                             onNavigate(prevId);
                           }}
-                          className="flex items-center justify-center absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/80 dark:bg-slate-800/80 shadow hover:bg-white dark:hover:bg-slate-700 transition disabled:opacity-50"
+                          className="flex items-center justify-center absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/80 dark:bg-slate-800/80 shadow hover:bg-white dark:hover:bg-slate-700 transition disabled:opacity-50 hint-loop"
                         >
                           <ChevronLeftIcon className="w-6 h-6" />
                         </button>
@@ -339,53 +339,80 @@ export function PokemonModal({
                 <div className="flex justify-between items-center mt-6 px-4">
                   <button
                     type="button"
+                    onPointerDown={(e) => {
+                      e.stopPropagation();
+                      onClose();
+                    }}
                     onClick={onClose}
-                    className="w-12 h-12 bg-slate-800 rounded-full border-b-4 border-black shadow-lg active:translate-y-1 transition-all"
+                    className="w-12 h-12 bg-slate-800 rounded-full border-b-4 border-black shadow-lg active:translate-y-1 transition-all hint-loop"
                     aria-label="Close"
                   />
                   <div className="flex gap-3">
                     <div className="w-14 h-3 bg-blue-900 rounded-sm border border-black/40 shadow-inner" />
                     <div className="w-14 h-3 bg-green-900 rounded-sm border border-black/40 shadow-inner" />
                   </div>
-                  <div className={cn('relative w-16 h-16 cursor-pointer hint-loop')}>
+                  <div
+                    className={cn('relative w-16 h-16 cursor-pointer hint-loop select-none touch-none')}
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <div className="absolute top-1/2 left-0 w-16 h-5 -translate-y-1/2 bg-slate-800 rounded-sm border-b-2 border-black transition hover:ring-2 hover:ring-emerald-400/40" />
                     <div className="absolute left-1/2 top-0 w-5 h-16 -translate-x-1/2 bg-slate-800 rounded-sm border-r-2 border-black transition hover:ring-2 hover:ring-emerald-400/40" />
                     <button
                       type="button"
                       aria-label="Previous"
                       disabled={isFetching || !pokemon || (pokemon && pokemon.id <= 1) || !onNavigate}
+                      onPointerDown={(e) => {
+                        e.preventDefault();
+                        if (!pokemon || !onNavigate) return;
+                        const prevId = Math.max(1, pokemon.id - 1);
+                        onNavigate(prevId);
+                      }}
                       onClick={() => {
                         if (!pokemon || !onNavigate) return;
                         const prevId = Math.max(1, pokemon.id - 1);
                         onNavigate(prevId);
                       }}
-                      className="absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6"
+                      className="absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10"
                     />
                     <button
                       type="button"
                       aria-label="Next"
                       disabled={isFetching || !pokemon || !onNavigate}
+                      onPointerDown={(e) => {
+                        e.preventDefault();
+                        if (!pokemon || !onNavigate) return;
+                        onNavigate(pokemon.id + 1);
+                      }}
                       onClick={() => {
                         if (!pokemon || !onNavigate) return;
                         onNavigate(pokemon.id + 1);
                       }}
-                      className="absolute right-0 top-1/2 -translate-y-1/2 w-6 h-6"
+                      className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10"
                     />
                     <button
                       type="button"
                       aria-label="Up"
+                      onPointerDown={(e) => {
+                        e.preventDefault();
+                        screenRef.current?.scrollBy({ top: -120, behavior: 'smooth' });
+                      }}
                       onClick={() => {
                         screenRef.current?.scrollBy({ top: -120, behavior: 'smooth' });
                       }}
-                      className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-6"
+                      className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-10"
                     />
                     <button
                       type="button"
                       aria-label="Down"
+                      onPointerDown={(e) => {
+                        e.preventDefault();
+                        screenRef.current?.scrollBy({ top: 120, behavior: 'smooth' });
+                      }}
                       onClick={() => {
                         screenRef.current?.scrollBy({ top: 120, behavior: 'smooth' });
                       }}
-                      className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-6"
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 w-10 h-10"
                     />
                   </div>
                 </div>
