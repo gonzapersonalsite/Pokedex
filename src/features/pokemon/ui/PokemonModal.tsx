@@ -40,6 +40,13 @@ export function PokemonModal({
     }
   }, [open]);
   useEffect(() => {
+    if (open && pokemonIdOrName != null) {
+      setScan(true);
+      const t = setTimeout(() => setScan(false), 1600);
+      return () => clearTimeout(t);
+    }
+  }, [open, pokemonIdOrName]);
+  useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -51,14 +58,6 @@ export function PokemonModal({
   const { data: evolutionTree } = useEvolutionTree(pokemonIdOrName);
   const { favorites, toggle } = useFavoritesStore();
   const screenRef = useRef<HTMLDivElement | null>(null);
-  const [hintControls, setHintControls] = useState(false);
-  useEffect(() => {
-    if (open) {
-      setHintControls(true);
-      const t = setTimeout(() => setHintControls(false), 2000);
-      return () => clearTimeout(t);
-    }
-  }, [open]);
 
   const isFavorite = pokemon ? favorites.includes(pokemon.id) : false;
 
@@ -178,7 +177,7 @@ export function PokemonModal({
                           title="Next Pokémon"
                           disabled={isFetching}
                           onClick={() => onNavigate(pokemon.id + 1)}
-                          className="flex items-center justify-center absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/80 dark:bg-slate-800/80 shadow hover:bg-white dark:hover:bg-slate-700 transition disabled:opacity-50"
+                    className="flex items-center justify-center absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/80 dark:bg-slate-800/80 shadow hover:bg-white dark:hover:bg-slate-700 transition disabled:opacity-50 hint-loop"
                         >
                           <ChevronRightIcon className="w-6 h-6" />
                         </button>
@@ -348,13 +347,7 @@ export function PokemonModal({
                     <div className="w-14 h-3 bg-blue-900 rounded-sm border border-black/40 shadow-inner" />
                     <div className="w-14 h-3 bg-green-900 rounded-sm border border-black/40 shadow-inner" />
                   </div>
-                  <div
-                    className={cn(
-                      'relative w-16 h-16 cursor-pointer',
-                      hintControls ? 'animate-pulse' : ''
-                    )}
-                    onMouseEnter={() => setHintControls(false)}
-                  >
+                  <div className={cn('relative w-16 h-16 cursor-pointer hint-loop')}>
                     <div className="absolute top-1/2 left-0 w-16 h-5 -translate-y-1/2 bg-slate-800 rounded-sm border-b-2 border-black transition hover:ring-2 hover:ring-emerald-400/40" />
                     <div className="absolute left-1/2 top-0 w-5 h-16 -translate-x-1/2 bg-slate-800 rounded-sm border-r-2 border-black transition hover:ring-2 hover:ring-emerald-400/40" />
                     <button

@@ -43,3 +43,13 @@ body {
 .animate-scan {
   animation: scanline 1.6s cubic-bezier(0.16, 1, 0.3, 1) 2 alternate forwards;
 }
+
+@keyframes hintPulse {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.0); }
+  50% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0.18); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.0); }
+}
+
+.hint-loop {
+  animation: hintPulse 6s ease-in-out infinite;
+}
