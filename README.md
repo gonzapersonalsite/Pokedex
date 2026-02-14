@@ -1,97 +1,54 @@
-# Pokédex
+# Pokedex
 
-Pokédex React + Vite + TypeScript con arquitectura **Feature-Sliced** y **Container/Presentational**. TanStack Query para datos, Zustand para favoritos, Tailwind + HeadlessUI + Heroicons. PWA con soporte offline.
+English | [Español](./docs/es/README.md)
 
-## Demo
+Modern Pokédex built with React + Vite + TypeScript. It uses Feature-Sliced architecture and a container/presentational split. Data fetching with TanStack Query, state with Zustand, styling with Tailwind, icons with Heroicons. Includes a global toast system and a PWA.
 
-- **Vercel:** [Configura deploy desde GitHub](https://vercel.com/new) apuntando a este repo. Build: `npm run build`, Output: `dist`, Install: `npm ci`.
+## Features
+- Infinite scroll list with type filter (excludes “unknown”, “shadow” and “stellar”).
+- Favorites: toggle in cards and details, and a “Favorites” filter to list only your saved Pokémon.
+- Search by name or ID with centered loading feedback.
+- Details modal with evolution chain and intra-modal navigation by clicking evolutions.
+- Global toast notifications (top-right, below the navbar).
+- PWA build.
 
-## Arquitectura
+## Getting Started
+- Install: `npm ci`
+- Dev: `npm run dev`
+- Test: `npm run test`
+- Build: `npm run build`
+- Preview: `npm run preview`
 
+## Tech Stack
+- React 18, TypeScript, Vite
+- TanStack Query, Zustand (persist), TailwindCSS, Heroicons
+- Vitest, Testing Library
+
+## Architecture
 ```
 src/
-├── app/                 # Capa de aplicación
-│   ├── providers/       # QueryClient, Theme (Context)
-│   ├── ErrorBoundary.tsx
-│   ├── App.tsx
-│   └── index.css
-├── entities/            # Modelos de dominio
-│   ├── pokemon/         # Tipos API + modelo (Pokemon, EvolutionNode)
-│   └── type/            # TypeOption (re-export)
+├── app/                 # Application layer (providers, App, ErrorBoundary, global styles)
+├── entities/            # Domain models (Pokemon, EvolutionNode, TypeOption)
 ├── features/
-│   └── pokemon/
-│       ├── lib/         # pokemonApi (fetch list, details, types, evolution-chain)
-│       ├── model/       # Hooks: usePokemonList, usePokemonDetails,
-│       │                 # usePokemonSearch, useEvolutionTree, useTypes
-│       └── ui/          # PokemonCard (Presentational), PokemonList (Container),
-│                        # PokemonModal (detalle + evolución)
-├── shared/
-│   ├── ui/              # Button, Loader
-│   ├── utils/           # cn, etc.
-│   └── test/            # setup Vitest
+│   └── pokemon/         # API, hooks (list, search, details, types, evolution), UI (card, list, modal)
 ├── pages/
-│   └── PokedexPage.tsx  # Ensambla listado, búsqueda, modal, tema
-├── store/
-│   └── favorites.ts     # Zustand + persist (localStorage)
+│   └── PokedexPage.tsx  # Page composition (filters, favorites, list, modal)
+├── shared/              # UI primitives (Button, Loader, Toast), utils (cn, typeBadge), tests setup
+├── store/               # Global stores (favorites, toast)
 └── main.tsx
 ```
 
-### Diagrama de flujo
-
-```
-                    ┌─────────────────┐
-                    │   PokedexPage   │
-                    └────────┬────────┘
-                             │
-         ┌───────────────────┼───────────────────┐
-         ▼                   ▼                   ▼
-  ┌──────────────┐   ┌──────────────┐   ┌──────────────┐
-  │ PokemonList  │   │ SearchResult │   │ PokemonModal │
-  │ (Container)  │   │ (useSearch)  │   │ (Details +   │
-  └──────┬───────┘   └──────────────┘   │  Evolution)  │
-         │                               └──────────────┘
-         │ usePokemonList (useInfiniteQuery)
-         │ useFavoritesStore
-         ▼
-  ┌──────────────┐     ┌──────────────┐
-  │ PokemonCard  │     │  pokemonApi  │ ← pokeapi.co/v2
-  │(Presentational)   │  (lib)       │
-  └──────────────┘     └──────────────┘
-```
-
-- **Queries:** list (infinite), details, search, evolution chain, types.
-- **Estado global:** solo Theme (Context) y Favoritos (Zustand persist).
-- **Sin globals:** tipado estricto, alias `@/` para imports.
-
-## Stack
-
-- **React 18** + **Vite** + **TypeScript** (strict)
-- **TanStack Query** – fetches (list, details, evolutions, types), infinite scroll con `useInfiniteQuery`
-- **Zustand** – favoritos persistentes (localStorage)
-- **Tailwind CSS** + **HeadlessUI** + **Heroicons**
-- **react-window** – lista virtualizada
-- **Error Boundary** + **Suspense**
-- **PWA** (vite-plugin-pwa): manifest, Workbox, cache de PokeAPI para offline
-- **Vitest** + **@testing-library/react** – tests por hook (usePokemonSearch, useEvolutionTree, store favoritos)
-
-## Scripts
-
-```bash
-npm install
-npm run dev      # http://localhost:5173
-npm run build
-npm run preview  # vista previa del build
-npm run test     # Vitest
-```
-
-## Endpoints usados
-
+## API Endpoints (PokeAPI)
 - `GET https://pokeapi.co/api/v2/pokemon?offset=&limit=`
 - `GET https://pokeapi.co/api/v2/pokemon/:id|:name`
 - `GET https://pokeapi.co/api/v2/pokemon-species/:id|:name`
 - `GET https://pokeapi.co/api/v2/evolution-chain/:id`
-- `GET https://pokeapi.co/api/v2/type` y `GET .../type/:id|:name`
+- `GET https://pokeapi.co/api/v2/type`
+- `GET https://pokeapi.co/api/v2/type/:id|:name`
+
+## Accessibility
+- Search input implemented as a proper ARIA combobox with a controlled listbox.
+- Cards avoid nested interactive controls.
 
 ## Responsive
-
-Diseño mobile-first; listado en 2 columnas, header sticky, modal adaptable.
+Mobile-first layout with sticky header and adaptive modal.
