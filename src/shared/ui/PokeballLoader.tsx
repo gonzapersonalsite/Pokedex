@@ -9,16 +9,14 @@ export function PokeballLoader({ className = '' }: { className?: string }) {
     <div
       className={`flex flex-col items-center justify-center gap-3 p-8 ${className}`}
       role="status"
-      aria-label="Cargando"
+      aria-label="Loading"
     >
       <div className="relative w-[100px] h-[100px] flex items-center justify-center">
         <div className="pokeball-loader-item absolute inset-0 flex items-center justify-center">
           <PokeballIcon size={100} />
         </div>
       </div>
-      <span className="text-sm text-slate-500 dark:text-slate-400">
-        Cargando…
-      </span>
+      <span className="text-sm text-slate-500 dark:text-slate-400">Loading…</span>
     </div>
   );
 }

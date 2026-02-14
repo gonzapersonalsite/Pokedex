@@ -48,7 +48,7 @@ export function PokemonCard({
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-slate-400 text-sm">
-                Sin imagen
+              No image
               </div>
             )}
           </div>
@@ -81,7 +81,7 @@ export function PokemonCard({
             type="button"
             onClick={() => onToggleFavorite(pokemon.id)}
             className="absolute top-2 right-2 p-2 rounded-full bg-white/95 dark:bg-slate-800/95 shadow-md hover:scale-110 transition"
-            aria-label={isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+            aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
           >
             {isFavorite ? (
               <HeartIconSolid className="w-5 h-5 text-red-500" />

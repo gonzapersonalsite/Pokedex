@@ -73,7 +73,7 @@ export function PokemonList({ onSelectPokemon, typeFilter, favoritesOnly = false
         className="py-12 text-center text-red-600 dark:text-red-400 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900"
         role="alert"
       >
-        Error: {error?.message ?? 'No se pudo cargar la lista.'}
+        Error: {error?.message ?? 'Could not load the list.'}
       </div>
     );
   }
@@ -81,7 +81,7 @@ export function PokemonList({ onSelectPokemon, typeFilter, favoritesOnly = false
   if (!favoritesOnly && list.length === 0) {
     return (
       <div className="py-12 text-center text-slate-500 dark:text-slate-400">
-        No hay Pokémon para mostrar.
+        There are no Pokémon to display.
       </div>
     );
   }
@@ -90,7 +90,7 @@ export function PokemonList({ onSelectPokemon, typeFilter, favoritesOnly = false
     if (favorites.length === 0) {
       return (
         <div className="py-12 text-center text-slate-500 dark:text-slate-400">
-          Aún no has añadido favoritos.
+          You haven’t added any favorites yet.
         </div>
       );
     }
@@ -103,7 +103,7 @@ export function PokemonList({ onSelectPokemon, typeFilter, favoritesOnly = false
           className="py-12 text-center text-red-600 dark:text-red-400 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900"
           role="alert"
         >
-          Error: {favError instanceof Error ? favError.message : 'No se pudieron cargar los favoritos.'}
+        Error: {favError instanceof Error ? favError.message : 'Could not load favorites.'}
         </div>
       );
     }
@@ -124,12 +124,13 @@ export function PokemonList({ onSelectPokemon, typeFilter, favoritesOnly = false
               onToggleFavorite={(id) => {
                 const wasFavorite = favorites.includes(id);
                 toggle(id);
+                const displayName = pokemon.name.replace(/-/g, ' ');
                 toast({
                   variant: wasFavorite ? 'info' : 'success',
-                  title: wasFavorite ? 'Quitado de favoritos' : 'Añadido a favoritos',
+                  title: wasFavorite ? 'Removed from favorites' : 'Added to favorites',
                   message: wasFavorite
-                    ? 'Se ha quitado de favoritos.'
-                    : 'Se ha añadido a favoritos.',
+                    ? `${displayName} was removed from your favorites.`
+                    : `${displayName} was added to your favorites.`,
                 });
               }}
               onClick={onSelectPokemon}

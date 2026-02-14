@@ -1,7 +1,15 @@
-import { Dialog, Transition, Disclosure } from '@headlessui/react';
+import {
+  Dialog,
+  DialogPanel,
+  Transition,
+  TransitionChild,
+  Disclosure,
+  DisclosureButton,
+  DisclosurePanel,
+} from '@headlessui/react';
 import { Fragment } from 'react';
 import { useQueries } from '@tanstack/react-query';
-import { XMarkIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { usePokemonDetails, useEvolutionTree } from '../model';
 import { useFavoritesStore } from '@/store/favorites';
 import { Button, toast } from '@/shared/ui';
@@ -72,7 +80,7 @@ export function PokemonModal({
   return (
     <Transition show={open} as={Fragment}>
       <Dialog onClose={onClose} className="relative z-50">
-        <Transition.Child
+        <TransitionChild
           as={Fragment}
           enter="ease-out duration-200"
           enterFrom="opacity-0"
@@ -82,9 +90,9 @@ export function PokemonModal({
           leaveTo="opacity-0"
         >
           <div className="fixed inset-0 bg-black/60" aria-hidden />
-        </Transition.Child>
+        </TransitionChild>
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Transition.Child
+          <TransitionChild
             as={Fragment}
             enter="ease-out duration-200"
             enterFrom="opacity-0 scale-95"
@@ -93,13 +101,40 @@ export function PokemonModal({
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <Dialog.Panel className="relative mx-auto w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-xl">
+            <DialogPanel className="relative mx-auto w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-xl">
+              {pokemon && onNavigate && (
+                <>
+                  <button
+                    type="button"
+                    aria-label="Previous Pokémon"
+                    title="Previous Pokémon"
+                    disabled={isFetching || pokemon.id <= 1}
+                    onClick={() => {
+                      const prevId = Math.max(1, pokemon.id - 1);
+                      onNavigate(prevId);
+                    }}
+                    className="hidden sm:flex items-center justify-center absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 dark:bg-slate-800/80 shadow hover:bg-white dark:hover:bg-slate-700 transition disabled:opacity-50"
+                  >
+                    <ChevronLeftIcon className="w-6 h-6" />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Next Pokémon"
+                    title="Next Pokémon"
+                    disabled={isFetching}
+                    onClick={() => onNavigate(pokemon.id + 1)}
+                    className="hidden sm:flex items-center justify-center absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 dark:bg-slate-800/80 shadow hover:bg-white dark:hover:bg-slate-700 transition disabled:opacity-50"
+                  >
+                    <ChevronRightIcon className="w-6 h-6" />
+                  </button>
+                </>
+              )}
               <div className="sticky top-0 flex justify-end p-2 bg-white/90 dark:bg-slate-900/90 z-10">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={onClose}
-                  aria-label="Cerrar"
+                  aria-label="Close"
                 >
                   <XMarkIcon className="w-6 h-6" />
                 </Button>
@@ -149,18 +184,18 @@ export function PokemonModal({
                       )}
                       <div className="grid grid-cols-2 gap-4 mt-4 text-sm">
                         <div>
-                          <span className="text-slate-600 dark:text-slate-300">Altura</span>
+                          <span className="text-slate-600 dark:text-slate-300">Height</span>
                           <p className="font-medium">{pokemon.height / 10} m</p>
                         </div>
                         <div>
-                          <span className="text-slate-600 dark:text-slate-300">Peso</span>
+                          <span className="text-slate-600 dark:text-slate-300">Weight</span>
                           <p className="font-medium">{pokemon.weight / 10} kg</p>
                         </div>
                       </div>
                       {weaknesses.length > 0 && (
                         <div className="mt-6 text-left">
                           <h3 className="font-semibold text-slate-800 dark:text-slate-100 mb-2">
-                            Debilidades
+                            Weaknesses
                           </h3>
                           <div className="flex flex-wrap gap-2">
                             {weaknesses.map(([type, factor]) => (
@@ -182,16 +217,16 @@ export function PokemonModal({
                         <Disclosure>
                           {({ open }) => (
                             <div className="mt-6 text-left">
-                              <Disclosure.Button className="w-full flex items-center justify-between rounded-lg bg-slate-100 dark:bg-slate-800 px-4 py-2 text-left font-semibold text-slate-800 dark:text-slate-100">
-                                <span>Movimientos</span>
+                              <DisclosureButton className="w-full flex items-center justify-between rounded-lg bg-slate-100 dark:bg-slate-800 px-4 py-2 text-left font-semibold text-slate-800 dark:text-slate-100">
+                                <span>Moves</span>
                                 <ChevronDownIcon
                                   className={cn(
                                     'w-5 h-5 transition-transform',
                                     open ? 'rotate-180' : ''
                                   )}
                                 />
-                              </Disclosure.Button>
-                              <Disclosure.Panel>
+                              </DisclosureButton>
+                              <DisclosurePanel>
                                 <ul className="grid grid-cols-2 gap-2 p-3">
                                   {pokemon.moves.slice(0, 12).map((m) => (
                                     <li
@@ -202,7 +237,7 @@ export function PokemonModal({
                                     </li>
                                   ))}
                                 </ul>
-                              </Disclosure.Panel>
+                              </DisclosurePanel>
                             </div>
                           )}
                         </Disclosure>
@@ -214,22 +249,23 @@ export function PokemonModal({
                         onClick={() => {
                           const wasFavorite = isFavorite;
                           toggle(pokemon.id);
+                          const displayName = pokemon.name.replace(/-/g, ' ');
                           toast({
                             variant: wasFavorite ? 'info' : 'success',
-                            title: wasFavorite ? 'Quitado de favoritos' : 'Añadido a favoritos',
+                            title: wasFavorite ? 'Removed from favorites' : 'Added to favorites',
                             message: wasFavorite
-                              ? 'Se ha quitado de favoritos.'
-                              : 'Se ha añadido a favoritos.',
+                              ? `${displayName} was removed from your favorites.`
+                              : `${displayName} was added to your favorites.`,
                           });
                         }}
                       >
-                        {isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+                        {isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                       </Button>
                     </div>
                     {evolutionTree && (
                       <div className="mt-8 border-t border-slate-200 dark:border-slate-700 pt-6">
                         <h3 className="font-semibold text-slate-800 dark:text-slate-100 mb-4">
-                          Cadena de evolución
+                          Evolution chain
                         </h3>
                         <EvolutionChain chain={evolutionTree} onNavigate={onNavigate} />
                       </div>
@@ -237,8 +273,8 @@ export function PokemonModal({
                   </>
                 )}
               </div>
-            </Dialog.Panel>
-          </Transition.Child>
+            </DialogPanel>
+          </TransitionChild>
         </div>
       </Dialog>
     </Transition>
@@ -316,8 +352,8 @@ function EvolutionChip({
       type="button"
       onClick={() => onClick?.(id)}
       className="inline-flex px-3 py-1.5 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-100 capitalize text-sm font-medium hover:bg-slate-300 dark:hover:bg-slate-600 transition"
-      aria-label={`Ver ${displayName}`}
-      title={`Ver ${displayName}`}
+      aria-label={`View ${displayName}`}
+      title={`View ${displayName}`}
     >
       {displayName}
     </button>

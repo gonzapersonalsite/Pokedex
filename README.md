@@ -5,7 +5,7 @@ English | [Español](./docs/es/README.md)
 Modern Pokédex built with React + Vite + TypeScript. It uses Feature-Sliced architecture and a container/presentational split. Data fetching with TanStack Query, state with Zustand, styling with Tailwind, icons with Heroicons. Includes a global toast system and a PWA.
 
 ## Features
-- Infinite scroll list with type filter (excludes “unknown”, “shadow” and “stellar”).
+- Infinite scroll list with type filter.
 - Favorites: toggle in cards and details, and a “Favorites” filter to list only your saved Pokémon.
 - Search by name or ID with centered loading feedback.
 - Details modal with evolution chain and intra-modal navigation by clicking evolutions.

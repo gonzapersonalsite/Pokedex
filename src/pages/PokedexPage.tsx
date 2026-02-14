@@ -30,7 +30,7 @@ export function PokedexPage() {
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans">
       {/* Header tipo Pokédex: barra superior clara */}
-      <header className="sticky top-0 z-20 border-b-4 border-slate-800 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm">
+      <header id="top" className="sticky top-0 z-20 border-b-4 border-slate-800 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
@@ -57,7 +57,7 @@ export function PokedexPage() {
                 size="sm"
                 onClick={toggleTheme}
                 className="self-start sm:self-center"
-                aria-label={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
+                aria-label={theme === 'dark' ? 'Light mode' : 'Dark mode'}
               >
                 {theme === 'dark' ? (
                   <SunIcon className="w-6 h-6" />
@@ -71,7 +71,7 @@ export function PokedexPage() {
       </header>
 
       {/* Contenido a ancho completo: scroll de toda la página */}
-      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 pb-12">
+      <main id="main-content" className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 pb-12">
         {searchSubmitted ? (
           <Suspense
             fallback={
@@ -139,7 +139,7 @@ function TypeFilter({
   return (
     <div className="mb-6">
       <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
-        Filtrar por tipo
+        Filter by type
       </p>
       <div className="flex flex-wrap gap-2">
         <button
@@ -152,7 +152,7 @@ function TypeFilter({
               : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600'
           )}
         >
-          Todos
+          All
         </button>
         <button
           type="button"
@@ -164,7 +164,7 @@ function TypeFilter({
               : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600'
           )}
         >
-          Favoritos
+          Favorites
         </button>
         {types.map((t) => {
           const isSelected = selectedType === t.name;
@@ -206,6 +206,7 @@ function SearchBar({
   maxSuggestions?: number;
 }) {
   const [open, setOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState<number>(-1);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const q = value.trim().toLowerCase();
@@ -223,6 +224,7 @@ function SearchBar({
     function handleClickOutside(ev: MouseEvent) {
       if (containerRef.current?.contains(ev.target as Node)) return;
       setOpen(false);
+      setActiveIndex(-1);
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -230,9 +232,19 @@ function SearchBar({
 
   const showDropdown = open && filtered.length > 0 && value.length > 0;
 
+  useEffect(() => {
+    if (showDropdown && activeIndex === -1) {
+      setActiveIndex(0);
+    }
+    if (!showDropdown) {
+      setActiveIndex(-1);
+    }
+  }, [showDropdown]);
+
   const pick = (name: string) => {
     onSelectSuggestion?.(name);
     setOpen(false);
+    setActiveIndex(-1);
   };
 
   return (
@@ -246,24 +258,51 @@ function SearchBar({
           onChange={(e) => {
             onChange(e.target.value);
             setOpen(true);
+            setActiveIndex(0);
           }}
           onFocus={() => value.length > 0 && setOpen(true)}
           onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              if (filtered.length > 0 && onSelectSuggestion) {
+            if (e.key === 'ArrowDown') {
+              e.preventDefault();
+              if (!showDropdown) {
+                setOpen(true);
+                setActiveIndex(0);
+                return;
+              }
+              setActiveIndex((prev) =>
+                filtered.length === 0 ? -1 : Math.min((prev < 0 ? 0 : prev) + 1, filtered.length - 1)
+              );
+            } else if (e.key === 'ArrowUp') {
+              e.preventDefault();
+              if (!showDropdown) return;
+              setActiveIndex((prev) =>
+                filtered.length === 0 ? -1 : Math.max((prev < 0 ? 0 : prev) - 1, 0)
+              );
+            } else if (e.key === 'Enter') {
+              if (activeIndex >= 0 && filtered[activeIndex]) {
+                pick(filtered[activeIndex].name);
+              } else if (filtered.length > 0 && onSelectSuggestion) {
                 pick(filtered[0].name);
               } else {
                 onSubmit();
               }
+            } else if (e.key === 'Escape') {
+              setOpen(false);
+              setActiveIndex(-1);
             }
           }}
-          placeholder="Buscar por nombre o ID..."
+          placeholder="Search by name or ID..."
           className="w-full pl-10 pr-4 py-2.5 rounded-xl border-2 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          aria-label="Buscar Pokémon"
+          aria-label="Search Pokémon"
           aria-autocomplete="list"
           aria-controls="search-suggestions"
           aria-haspopup="listbox"
           aria-expanded={!!showDropdown}
+          aria-activedescendant={
+            activeIndex >= 0 && filtered[activeIndex]
+              ? `search-option-${filtered[activeIndex].id}`
+              : undefined
+          }
         />
         {showDropdown && (
           <ul
@@ -271,18 +310,26 @@ function SearchBar({
             role="listbox"
             id="search-suggestions"
           >
-            {filtered.map((s) => (
+            {filtered.map((s, i) => (
               <li
                 key={s.id}
                 role="option"
+                id={`search-option-${s.id}`}
                 tabIndex={0}
-                className="px-4 py-2.5 text-left hover:bg-slate-100 dark:hover:bg-slate-700 flex justify-between items-center gap-2 cursor-pointer"
+                aria-selected={i === activeIndex}
+                className={cn(
+                  'px-4 py-2.5 text-left flex justify-between items-center gap-2 cursor-pointer',
+                  i === activeIndex
+                    ? 'bg-slate-100 dark:bg-slate-700'
+                    : 'hover:bg-slate-100 dark:hover:bg-slate-700'
+                )}
                 onClick={() => pick(s.name)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     pick(s.name);
                   }
                 }}
+                onMouseEnter={() => setActiveIndex(i)}
               >
                 <span className="font-medium capitalize text-slate-800 dark:text-slate-100">
                   {s.name.replace(/-/g, ' ')}
@@ -297,11 +344,11 @@ function SearchBar({
       </div>
       <div className="flex gap-2 shrink-0">
         <Button variant="primary" size="md" onClick={onSubmit}>
-          Buscar
+          Search
         </Button>
         {value ? (
           <Button variant="ghost" size="md" onClick={onClear}>
-            Limpiar
+            Clear
           </Button>
         ) : null}
       </div>
@@ -330,18 +377,18 @@ function SearchResult({
   if (status === 'error') {
     const message =
       error?.message?.startsWith('HTTP ')
-        ? 'No hay ningún Pokémon con ese nombre o ID. Prueba con "Pikachu" o "25".'
-        : (error?.message ?? 'No encontramos ese Pokémon.');
+        ? 'There is no Pokémon with that name or ID. Try "Pikachu" or "25".'
+        : (error?.message ?? 'We could not find that Pokémon.');
     return (
       <div className="text-center py-12 px-4">
         <p className="text-slate-700 dark:text-slate-300 mb-2 font-medium">
           {message}
         </p>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
-          Escribe un nombre o número en la búsqueda o elige una sugerencia.
+          Type a name or number in the search or pick a suggestion.
         </p>
         <Button variant="secondary" onClick={onClose}>
-          Volver al listado
+          Back to list
         </Button>
       </div>
     );
@@ -352,7 +399,7 @@ function SearchResult({
   return (
     <div className="max-w-md mx-auto">
       <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
-        Resultado para &quot;{query}&quot;
+        Result for &quot;{query}&quot;
       </p>
       <button
         type="button"
@@ -367,7 +414,7 @@ function SearchResult({
         </span>
       </button>
       <Button variant="ghost" className="mt-4 w-full sm:w-auto" onClick={onClose}>
-        Volver al listado
+        Back to list
       </Button>
     </div>
   );
