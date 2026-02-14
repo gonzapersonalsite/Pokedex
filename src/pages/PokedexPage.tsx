@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, Suspense } from 'react';
 import { PokemonList, PokemonModal } from '@/features/pokemon/ui';
 import { usePokemonSearch, usePokemonNames, useTypes } from '@/features/pokemon/model';
-import { Button, Loader, PokeballIcon } from '@/shared/ui';
+import { Button, Loader, PokeballIcon, toast } from '@/shared/ui';
 import { cn, getTypeBadgeClass } from '@/shared/utils';
 import { useTheme } from '@/app/providers';
 import { SunIcon, MoonIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
@@ -14,6 +14,8 @@ export function PokedexPage() {
   const [searchSubmitted, setSearchSubmitted] = useState('');
   const [typeFilter, setTypeFilter] = useState<string | null>(null);
   const [showFavorites, setShowFavorites] = useState(false);
+  const [installEvent, setInstallEvent] = useState<any>(null);
+  const [canInstall, setCanInstall] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const { data: allNames = [] } = usePokemonNames();
   const { data: typesList = [] } = useTypes();
@@ -26,6 +28,25 @@ export function PokedexPage() {
     setSearchQuery(name);
     setSearchSubmitted(name);
   };
+
+  useEffect(() => {
+    function onBeforeInstall(e: any) {
+      e.preventDefault();
+      setInstallEvent(e);
+      setCanInstall(true);
+    }
+    function onInstalled() {
+      setCanInstall(false);
+      setInstallEvent(null);
+      toast({ variant: 'success', title: 'App installed', message: 'The app was installed successfully.' });
+    }
+    window.addEventListener('beforeinstallprompt', onBeforeInstall);
+    window.addEventListener('appinstalled', onInstalled);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', onBeforeInstall);
+      window.removeEventListener('appinstalled', onInstalled);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans">
@@ -65,6 +86,32 @@ export function PokedexPage() {
                   <MoonIcon className="w-6 h-6" />
                 )}
               </Button>
+              {canInstall && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="self-start sm:self-center"
+                  onClick={async () => {
+                    const ev = installEvent;
+                    setCanInstall(false);
+                    if (!ev) return;
+                    ev.prompt();
+                    try {
+                      const { outcome } = await ev.userChoice;
+                      if (outcome === 'accepted') {
+                        toast({ variant: 'success', title: 'Installation requested', message: 'Follow the browser prompt to install.' });
+                      } else {
+                        toast({ variant: 'info', title: 'Installation dismissed', message: 'You can install the app later from the menu.' });
+                      }
+                    } finally {
+                      setInstallEvent(null);
+                    }
+                  }}
+                  aria-label="Install app"
+                >
+                  Install app
+                </Button>
+              )}
             </div>
           </div>
         </div>
