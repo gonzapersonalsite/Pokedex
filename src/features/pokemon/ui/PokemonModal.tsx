@@ -16,7 +16,7 @@ import { Button, toast } from '@/shared/ui';
 import { Loader } from '@/shared/ui';
 import { useAudio } from '@/hooks/useAudio';
 import type { EvolutionNode } from '@/entities/pokemon';
-import { cn, getTypeBadgeClass } from '@/shared/utils';
+import { cn, getTypeBadgeClass, scrollToTop } from '@/shared/utils';
 import { pokemonApi } from '../lib/pokemonApi';
 
 export interface PokemonModalProps {
@@ -76,6 +76,11 @@ export function PokemonModal({
   const { data: evolutionTree } = useEvolutionTree(pokemonIdOrName);
   const { favorites, toggle } = useFavoritesStore();
   const screenRef = useRef<HTMLDivElement | null>(null);
+  const navigateTo = (idOrName: number | string) => {
+    scrollToTop(screenRef.current, 'smooth');
+    playSound('pokedex-move');
+    onNavigate?.(idOrName);
+  };
 
   const isFavorite = pokemon ? favorites.includes(pokemon.id) : false;
 
@@ -184,18 +189,16 @@ export function PokemonModal({
                           onPointerDown={() => {
                             skipNextClickRef.current = true;
                             triggerBlue();
-                            playSound('pokedex-move');
                             const prevId = Math.max(1, pokemon.id - 1);
-                            onNavigate(prevId);
+                            navigateTo(prevId);
                           }}
                           onClick={() => {
                             if (skipNextClickRef.current) {
                               skipNextClickRef.current = false;
                               return;
                             }
-                            playSound('pokedex-move');
                             const prevId = Math.max(1, pokemon.id - 1);
-                            onNavigate(prevId);
+                            navigateTo(prevId);
                           }}
                           className="flex items-center justify-center absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/80 dark:bg-slate-800/80 shadow hover:bg-white dark:hover:bg-slate-700 transition disabled:opacity-50 hint-loop"
                         >
@@ -209,16 +212,14 @@ export function PokemonModal({
                           onPointerDown={() => {
                             skipNextClickRef.current = true;
                             triggerGreen();
-                            playSound('pokedex-move');
-                            onNavigate(pokemon.id + 1);
+                            navigateTo(pokemon.id + 1);
                           }}
                           onClick={() => {
                             if (skipNextClickRef.current) {
                               skipNextClickRef.current = false;
                               return;
                             }
-                            playSound('pokedex-move');
-                            onNavigate(pokemon.id + 1);
+                            navigateTo(pokemon.id + 1);
                           }}
                     className="flex items-center justify-center absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/80 dark:bg-slate-800/80 shadow hover:bg-white dark:hover:bg-slate-700 transition disabled:opacity-50 hint-loop"
                         >
@@ -364,7 +365,7 @@ export function PokemonModal({
                               <h3 className="font-semibold text-slate-800 dark:text-slate-100 mb-4">
                                 Evolution chain
                               </h3>
-                              <EvolutionChain chain={evolutionTree} onNavigate={onNavigate} />
+                          <EvolutionChain chain={evolutionTree} onNavigate={navigateTo} />
                             </div>
                           )}
                         </>
@@ -409,10 +410,9 @@ export function PokemonModal({
                         e.preventDefault();
                         skipNextClickRef.current = true;
                         triggerBlue();
-                        playSound('pokedex-move');
                         if (!pokemon || !onNavigate) return;
                         const prevId = Math.max(1, pokemon.id - 1);
-                        onNavigate(prevId);
+                        navigateTo(prevId);
                       }}
                       onClick={() => {
                         if (skipNextClickRef.current) {
@@ -420,10 +420,9 @@ export function PokemonModal({
                           return;
                         }
                         triggerBlue();
-                        playSound('pokedex-move');
                         if (!pokemon || !onNavigate) return;
                         const prevId = Math.max(1, pokemon.id - 1);
-                        onNavigate(prevId);
+                        navigateTo(prevId);
                       }}
                       className="absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10"
                     />
@@ -435,9 +434,8 @@ export function PokemonModal({
                         e.preventDefault();
                         skipNextClickRef.current = true;
                         triggerGreen();
-                        playSound('pokedex-move');
                         if (!pokemon || !onNavigate) return;
-                        onNavigate(pokemon.id + 1);
+                        navigateTo(pokemon.id + 1);
                       }}
                       onClick={() => {
                         if (skipNextClickRef.current) {
@@ -445,9 +443,8 @@ export function PokemonModal({
                           return;
                         }
                         triggerGreen();
-                        playSound('pokedex-move');
                         if (!pokemon || !onNavigate) return;
-                        onNavigate(pokemon.id + 1);
+                        navigateTo(pokemon.id + 1);
                       }}
                       className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10"
                     />
