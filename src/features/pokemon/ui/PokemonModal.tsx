@@ -35,7 +35,7 @@ export function PokemonModal({
   const [scan, setScan] = useState(false);
   const [blinkBlue, setBlinkBlue] = useState(false);
   const [blinkGreen, setBlinkGreen] = useState(false);
-  const { playSound, loadSound } = useAudio();
+  const { playSound, loadSounds } = useAudio();
   const skipNextClickRef = useRef(false);
   const triggerBlue = () => {
     setBlinkBlue(true);
@@ -46,10 +46,16 @@ export function PokemonModal({
     setTimeout(() => setBlinkGreen(false), 260);
   };
   useEffect(() => {
-    if (open) {
-      loadSound('pokedex-move', '/sounds/pokedexMoveButton.mp3');
-    }
-  }, [open, loadSound]);
+    if (!open) return;
+    (async () => {
+      await loadSounds({
+        'pokedex-move': '/sounds/pokedexMoveButton.mp3',
+        'pokedex-on': '/sounds/pokedexOn.wav',
+        'pokedex-off': '/sounds/pokedexOff.wav',
+      });
+      playSound('pokedex-on');
+    })();
+  }, [open, loadSounds, playSound]);
   useEffect(() => {
     if (open) {
       setScan(true);
@@ -64,10 +70,14 @@ export function PokemonModal({
       return () => clearTimeout(t);
     }
   }, [open, pokemonIdOrName]);
+  const closeWithSound = () => {
+    playSound('pokedex-off');
+    onClose();
+  };
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') closeWithSound();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -231,7 +241,7 @@ export function PokemonModal({
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={onClose}
+                        onClick={closeWithSound}
                         aria-label="Close"
                       >
                         <XMarkIcon className="w-6 h-6" />
@@ -385,9 +395,8 @@ export function PokemonModal({
                     type="button"
                     onPointerDown={(e) => {
                       e.stopPropagation();
-                      onClose();
+                      closeWithSound();
                     }}
-                    onClick={onClose}
                     className="w-12 h-12 bg-slate-800 rounded-full border-b-4 border-black shadow-lg active:translate-y-1 transition-all hint-loop"
                     aria-label="Close"
                   />
