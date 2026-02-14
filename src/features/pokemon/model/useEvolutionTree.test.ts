@@ -34,6 +34,15 @@ describe('useEvolutionTree', () => {
           Promise.resolve({
             id: 25,
             name: 'pikachu',
+            species: { name: 'pikachu', url: 'https://pokeapi.co/api/v2/pokemon-species/25/' },
+          }),
+      } as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            id: 25,
+            name: 'pikachu',
             evolution_chain: { url: 'https://pokeapi.co/api/v2/evolution-chain/10/' },
           }),
       } as Response)
