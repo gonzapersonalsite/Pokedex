@@ -7,7 +7,7 @@ import {
   DisclosureButton,
   DisclosurePanel,
 } from '@headlessui/react';
-import { Fragment } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { useQueries } from '@tanstack/react-query';
 import { XMarkIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { usePokemonDetails, useEvolutionTree } from '../model';
@@ -31,9 +31,34 @@ export function PokemonModal({
   onClose,
   onNavigate,
 }: PokemonModalProps) {
+  const [scan, setScan] = useState(false);
+  useEffect(() => {
+    if (open) {
+      setScan(true);
+      const t = setTimeout(() => setScan(false), 1400);
+      return () => clearTimeout(t);
+    }
+  }, [open]);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open, onClose]);
   const { data: pokemon, status, error, isFetching } = usePokemonDetails(pokemonIdOrName);
   const { data: evolutionTree } = useEvolutionTree(pokemonIdOrName);
   const { favorites, toggle } = useFavoritesStore();
+  const screenRef = useRef<HTMLDivElement | null>(null);
+  const [hintControls, setHintControls] = useState(false);
+  useEffect(() => {
+    if (open) {
+      setHintControls(true);
+      const t = setTimeout(() => setHintControls(false), 2000);
+      return () => clearTimeout(t);
+    }
+  }, [open]);
 
   const isFavorite = pokemon ? favorites.includes(pokemon.id) : false;
 
@@ -79,29 +104,35 @@ export function PokemonModal({
 
   return (
     <Transition show={open} as={Fragment}>
-      <Dialog onClose={onClose} className="relative z-50">
+      <Dialog onClose={() => {}} className="relative z-50">
+        {/* 1. BACKDROP MÁS SUAVE */}
         <TransitionChild
           as={Fragment}
-          enter="ease-out duration-200"
+          enter="ease-out duration-500" // Aumentado de 200 a 500
           enterFrom="opacity-0"
           enterTo="opacity-100"
-          leave="ease-in duration-150"
+          leave="ease-in duration-300"
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
           <div className="fixed inset-0 bg-black/60" aria-hidden />
         </TransitionChild>
         <div className="fixed inset-0 flex items-center justify-center p-4">
+          {/* 2. TRANSICIÓN DE LA POKÉDEX MÁS LENTA Y DINÁMICA */}
           <TransitionChild
             as={Fragment}
-            enter="ease-out duration-200"
-            enterFrom="opacity-0 scale-95"
-            enterTo="opacity-100 scale-100"
-            leave="ease-in duration-150"
-            leaveFrom="opacity-100 scale-100"
-            leaveTo="opacity-0 scale-95"
+            enter="ease-out duration-1000" // Aumentado de 450 a 1000 para que sea lento
+            enterFrom="opacity-0 translate-y-20 scale-90 -rotate-6" // Empieza más abajo y más rotado
+            enterTo="opacity-100 translate-y-0 scale-100 rotate-0"
+            leave="ease-in duration-500"
+            leaveFrom="opacity-100 translate-y-0 scale-100 rotate-0"
+            leaveTo="opacity-0 translate-y-10 scale-95"
           >
-            <div className="relative flex items-center justify-center p-2 w-full max-w-2xl">
+            <div
+              className="relative flex items-center justify-center p-2 w-full max-w-md sm:max-w-2xl"
+              onMouseDown={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="relative w-full bg-[#e30000] rounded-tl-[60px] rounded-tr-2xl rounded-br-2xl rounded-bl-[40px] border-b-[12px] border-r-[12px] border-[#a00000] p-4 sm:p-6 shadow-2xl overflow-hidden">
                 <div className="absolute left-0 top-1/4 bottom-1/4 w-3 bg-[#c00000] border-r border-black/10 rounded-r-full" />
                 <div className="flex items-start gap-4 mb-4 sm:mb-6">
@@ -116,7 +147,16 @@ export function PokemonModal({
                   </div>
                 </div>
                 <div className="bg-[#dedede] p-4 sm:p-6 pb-10 rounded-xl rounded-bl-[40px] border-b-4 border-r-4 border-gray-400 shadow-inner">
-                  <DialogPanel className="relative mx-auto w-full max-h-[60vh] sm:max-h-[65vh] overflow-y-auto rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border-2 border-black/20 shadow-[inset_0_0_20px_rgba(0,0,0,0.6)]">
+                  <DialogPanel
+                    ref={screenRef}
+                    className="relative mx-auto w-full max-h-[65vh] sm:max-h-[70vh] overflow-y-auto rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border-2 border-black/20 shadow-[inset_0_0_20px_rgba(0,0,0,0.6)]"
+                  >
+                    {scan && (
+                      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                        <div className="animate-scan absolute left-0 right-0 top-0 h-[45%] bg-gradient-to-b from-emerald-300/0 via-emerald-300/60 to-emerald-300/0 mix-blend-screen blur-[2px]" />
+                      </div>
+                    )}
+                    <div className="pointer-events-none absolute inset-0 opacity-[0.06] mix-blend-overlay bg-[repeating-linear-gradient(to_bottom,rgba(255,255,255,0.5)_0,rgba(255,255,255,0.5)_2px,rgba(0,0,0,0)_4px)]" />
                     {pokemon && onNavigate && (
                       <>
                         <button
@@ -128,7 +168,7 @@ export function PokemonModal({
                             const prevId = Math.max(1, pokemon.id - 1);
                             onNavigate(prevId);
                           }}
-                          className="hidden sm:flex items-center justify-center absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 dark:bg-slate-800/80 shadow hover:bg-white dark:hover:bg-slate-700 transition disabled:opacity-50"
+                          className="flex items-center justify-center absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/80 dark:bg-slate-800/80 shadow hover:bg-white dark:hover:bg-slate-700 transition disabled:opacity-50"
                         >
                           <ChevronLeftIcon className="w-6 h-6" />
                         </button>
@@ -138,7 +178,7 @@ export function PokemonModal({
                           title="Next Pokémon"
                           disabled={isFetching}
                           onClick={() => onNavigate(pokemon.id + 1)}
-                          className="hidden sm:flex items-center justify-center absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 dark:bg-slate-800/80 shadow hover:bg-white dark:hover:bg-slate-700 transition disabled:opacity-50"
+                          className="flex items-center justify-center absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/80 dark:bg-slate-800/80 shadow hover:bg-white dark:hover:bg-slate-700 transition disabled:opacity-50"
                         >
                           <ChevronRightIcon className="w-6 h-6" />
                         </button>
@@ -177,7 +217,7 @@ export function PokemonModal({
                             <h2 className="text-2xl font-bold capitalize text-slate-800 dark:text-slate-100">
                               {pokemon.name.replace(/-/g, ' ')}
                             </h2>
-                            <div className="flex justify-center gap-2 mt- tar2 flex-wrap">
+                            <div className="flex justify-center gap-2 mt-2 flex-wrap">
                               {pokemon.types.map((t) => (
                                 <span
                                   key={t}
@@ -194,7 +234,7 @@ export function PokemonModal({
                               <img
                                 src={pokemon.image}
                                 alt={pokemon.name}
-                                className="mx-auto w-48 h-48 object-contain mt-4"
+                                className="mx-auto w-40 h-40 sm:w-48 sm:h-48 object-contain mt-4"
                               />
                             )}
                             <div className="grid grid-cols-2 gap-4 mt-4 text-sm">
@@ -298,14 +338,62 @@ export function PokemonModal({
                   </div>
                 </div>
                 <div className="flex justify-between items-center mt-6 px-4">
-                  <div className="w-12 h-12 bg-slate-800 rounded-full border-b-4 border-black shadow-lg active:translate-y-1 transition-all" />
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="w-12 h-12 bg-slate-800 rounded-full border-b-4 border-black shadow-lg active:translate-y-1 transition-all"
+                    aria-label="Close"
+                  />
                   <div className="flex gap-3">
                     <div className="w-14 h-3 bg-blue-900 rounded-sm border border-black/40 shadow-inner" />
                     <div className="w-14 h-3 bg-green-900 rounded-sm border border-black/40 shadow-inner" />
                   </div>
-                  <div className="relative w-16 h-16">
-                    <div className="absolute top-1/2 left-0 w-16 h-5 -translate-y-1/2 bg-slate-800 rounded-sm border-b-2 border-black" />
-                    <div className="absolute left-1/2 top-0 w-5 h-16 -translate-x-1/2 bg-slate-800 rounded-sm border-r-2 border-black" />
+                  <div
+                    className={cn(
+                      'relative w-16 h-16 cursor-pointer',
+                      hintControls ? 'animate-pulse' : ''
+                    )}
+                    onMouseEnter={() => setHintControls(false)}
+                  >
+                    <div className="absolute top-1/2 left-0 w-16 h-5 -translate-y-1/2 bg-slate-800 rounded-sm border-b-2 border-black transition hover:ring-2 hover:ring-emerald-400/40" />
+                    <div className="absolute left-1/2 top-0 w-5 h-16 -translate-x-1/2 bg-slate-800 rounded-sm border-r-2 border-black transition hover:ring-2 hover:ring-emerald-400/40" />
+                    <button
+                      type="button"
+                      aria-label="Previous"
+                      disabled={isFetching || !pokemon || (pokemon && pokemon.id <= 1) || !onNavigate}
+                      onClick={() => {
+                        if (!pokemon || !onNavigate) return;
+                        const prevId = Math.max(1, pokemon.id - 1);
+                        onNavigate(prevId);
+                      }}
+                      className="absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6"
+                    />
+                    <button
+                      type="button"
+                      aria-label="Next"
+                      disabled={isFetching || !pokemon || !onNavigate}
+                      onClick={() => {
+                        if (!pokemon || !onNavigate) return;
+                        onNavigate(pokemon.id + 1);
+                      }}
+                      className="absolute right-0 top-1/2 -translate-y-1/2 w-6 h-6"
+                    />
+                    <button
+                      type="button"
+                      aria-label="Up"
+                      onClick={() => {
+                        screenRef.current?.scrollBy({ top: -120, behavior: 'smooth' });
+                      }}
+                      className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-6"
+                    />
+                    <button
+                      type="button"
+                      aria-label="Down"
+                      onClick={() => {
+                        screenRef.current?.scrollBy({ top: 120, behavior: 'smooth' });
+                      }}
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-6"
+                    />
                   </div>
                 </div>
               </div>

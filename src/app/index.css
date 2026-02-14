@@ -32,3 +32,14 @@ body {
 .pokeball-loader-item {
   animation: pokeball-loading 2s ease-in-out infinite;
 }
+
+@keyframes scanline {
+  0% { transform: translateY(-130%); opacity: 0; }
+  10% { opacity: 1; }
+  50% { opacity: 0.9; }
+  100% { transform: translateY(130%); opacity: 0; }
+}
+
+.animate-scan {
+  animation: scanline 1.6s cubic-bezier(0.16, 1, 0.3, 1) 2 alternate forwards;
+}
