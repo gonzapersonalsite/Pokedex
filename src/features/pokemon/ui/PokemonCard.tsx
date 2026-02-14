@@ -30,74 +30,66 @@ export function PokemonCard({
       )}
       data-testid="pokemon-card"
     >
-      <div
-        role="button"
-        tabIndex={0}
-        className="w-full text-left focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-inset rounded-2xl"
-        onClick={() => onClick?.(pokemon.id)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            onClick?.(pokemon.id);
-          }
-        }}
-        aria-label={`Ver detalles de ${displayName}`}
-      >
-        {/* Zona imagen: proporción fija, sin recortar contenido de abajo */}
-        <div className="relative aspect-square bg-gradient-to-b from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 p-4">
-          {pokemon.image ? (
-            <img
-              src={pokemon.image}
-              alt={displayName}
-              className="w-full h-full object-contain"
-              loading="lazy"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-slate-400 text-sm">
-              Sin imagen
-            </div>
-          )}
-          {onToggleFavorite && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleFavorite(pokemon.id);
-              }}
-              className="absolute top-2 right-2 p-2 rounded-full bg-white/95 dark:bg-slate-800/95 shadow-md hover:scale-110 transition"
-              aria-label={isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos'}
-            >
-              {isFavorite ? (
-                <HeartIconSolid className="w-5 h-5 text-red-500" />
-              ) : (
-                <HeartIconOutline className="w-5 h-5 text-slate-500" />
-              )}
-            </button>
-          )}
-        </div>
-
-        {/* Info siempre visible: número, nombre, tipos */}
-        <div className="p-4 min-h-[5.5rem] flex flex-col justify-center border-t border-slate-100 dark:border-slate-700">
-          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-0.5">
-            #{String(pokemon.id).padStart(3, '0')}
-          </p>
-          <h3 className="font-bold text-slate-800 dark:text-slate-100 text-lg leading-tight break-words">
-            {displayName}
-          </h3>
-          <div className="flex flex-wrap gap-1.5 mt-2">
-            {pokemon.types.map((type) => (
-              <span
-                key={type}
-                className={cn(
-                  'text-xs font-medium px-2.5 py-1 rounded-full capitalize',
-                  getTypeBadgeClass(type)
-                )}
-              >
-                {type}
-              </span>
-            ))}
+      <div className="relative">
+        <button
+          type="button"
+          className="w-full text-left focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-inset rounded-2xl"
+          onClick={() => onClick?.(pokemon.id)}
+          aria-label={`Ver detalles de ${displayName}`}
+        >
+          {/* Zona imagen: proporción fija, sin recortar contenido de abajo */}
+          <div className="aspect-square bg-gradient-to-b from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 p-4">
+            {pokemon.image ? (
+              <img
+                src={pokemon.image}
+                alt={displayName}
+                className="w-full h-full object-contain"
+                loading="lazy"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-slate-400 text-sm">
+                Sin imagen
+              </div>
+            )}
           </div>
-        </div>
+
+          {/* Info siempre visible: número, nombre, tipos */}
+          <div className="p-4 min-h-[5.5rem] flex flex-col justify-center border-t border-slate-100 dark:border-slate-700">
+            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-0.5">
+              #{String(pokemon.id).padStart(3, '0')}
+            </p>
+            <h3 className="font-bold text-slate-800 dark:text-slate-100 text-lg leading-tight break-words">
+              {displayName}
+            </h3>
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {pokemon.types.map((type) => (
+                <span
+                  key={type}
+                  className={cn(
+                    'text-xs font-medium px-2.5 py-1 rounded-full capitalize',
+                    getTypeBadgeClass(type)
+                  )}
+                >
+                  {type}
+                </span>
+              ))}
+            </div>
+          </div>
+        </button>
+        {onToggleFavorite && (
+          <button
+            type="button"
+            onClick={() => onToggleFavorite(pokemon.id)}
+            className="absolute top-2 right-2 p-2 rounded-full bg-white/95 dark:bg-slate-800/95 shadow-md hover:scale-110 transition"
+            aria-label={isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+          >
+            {isFavorite ? (
+              <HeartIconSolid className="w-5 h-5 text-red-500" />
+            ) : (
+              <HeartIconOutline className="w-5 h-5 text-slate-500" />
+            )}
+          </button>
+        )}
       </div>
     </article>
   );

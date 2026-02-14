@@ -237,16 +237,11 @@ function SearchBar({
 
   return (
     <div className="flex flex-wrap items-center gap-2 w-full" ref={containerRef}>
-      <div
-        className="relative flex-1 min-w-0"
-        role="combobox"
-        aria-haspopup="listbox"
-        aria-expanded={showDropdown}
-        aria-controls="search-suggestions"
-      >
+      <div className="relative flex-1 min-w-0">
         <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none z-10" />
         <input
           type="search"
+          role="combobox"
           value={value}
           onChange={(e) => {
             onChange(e.target.value);
@@ -267,6 +262,7 @@ function SearchBar({
           aria-label="Buscar Pokémon"
           aria-autocomplete="list"
           aria-controls="search-suggestions"
+          aria-expanded={showDropdown}
         />
         {showDropdown && (
           <ul
