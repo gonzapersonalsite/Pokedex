@@ -14,6 +14,7 @@ import { usePokemonDetails, useEvolutionTree } from '../model';
 import { useFavoritesStore } from '@/store/favorites';
 import { Button, toast } from '@/shared/ui';
 import { Loader } from '@/shared/ui';
+import { useAudio } from '@/hooks/useAudio';
 import type { EvolutionNode } from '@/entities/pokemon';
 import { cn, getTypeBadgeClass } from '@/shared/utils';
 import { pokemonApi } from '../lib/pokemonApi';
@@ -34,6 +35,8 @@ export function PokemonModal({
   const [scan, setScan] = useState(false);
   const [blinkBlue, setBlinkBlue] = useState(false);
   const [blinkGreen, setBlinkGreen] = useState(false);
+  const { playSound, loadSound } = useAudio();
+  const skipNextClickRef = useRef(false);
   const triggerBlue = () => {
     setBlinkBlue(true);
     setTimeout(() => setBlinkBlue(false), 260);
@@ -42,6 +45,11 @@ export function PokemonModal({
     setBlinkGreen(true);
     setTimeout(() => setBlinkGreen(false), 260);
   };
+  useEffect(() => {
+    if (open) {
+      loadSound('pokedex-move', '/sounds/pokedexMoveButton.mp3');
+    }
+  }, [open, loadSound]);
   useEffect(() => {
     if (open) {
       setScan(true);
@@ -173,8 +181,19 @@ export function PokemonModal({
                           aria-label="Previous Pokémon"
                           title="Previous Pokémon"
                           disabled={isFetching || pokemon.id <= 1}
-                          onPointerDown={() => triggerBlue()}
+                          onPointerDown={() => {
+                            skipNextClickRef.current = true;
+                            triggerBlue();
+                            playSound('pokedex-move');
+                            const prevId = Math.max(1, pokemon.id - 1);
+                            onNavigate(prevId);
+                          }}
                           onClick={() => {
+                            if (skipNextClickRef.current) {
+                              skipNextClickRef.current = false;
+                              return;
+                            }
+                            playSound('pokedex-move');
                             const prevId = Math.max(1, pokemon.id - 1);
                             onNavigate(prevId);
                           }}
@@ -187,8 +206,20 @@ export function PokemonModal({
                           aria-label="Next Pokémon"
                           title="Next Pokémon"
                           disabled={isFetching}
-                          onPointerDown={() => triggerGreen()}
-                          onClick={() => onNavigate(pokemon.id + 1)}
+                          onPointerDown={() => {
+                            skipNextClickRef.current = true;
+                            triggerGreen();
+                            playSound('pokedex-move');
+                            onNavigate(pokemon.id + 1);
+                          }}
+                          onClick={() => {
+                            if (skipNextClickRef.current) {
+                              skipNextClickRef.current = false;
+                              return;
+                            }
+                            playSound('pokedex-move');
+                            onNavigate(pokemon.id + 1);
+                          }}
                     className="flex items-center justify-center absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/80 dark:bg-slate-800/80 shadow hover:bg-white dark:hover:bg-slate-700 transition disabled:opacity-50 hint-loop"
                         >
                           <ChevronRightIcon className="w-6 h-6" />
@@ -376,13 +407,20 @@ export function PokemonModal({
                       disabled={isFetching || !pokemon || (pokemon && pokemon.id <= 1) || !onNavigate}
                       onPointerDown={(e) => {
                         e.preventDefault();
+                        skipNextClickRef.current = true;
                         triggerBlue();
+                        playSound('pokedex-move');
                         if (!pokemon || !onNavigate) return;
                         const prevId = Math.max(1, pokemon.id - 1);
                         onNavigate(prevId);
                       }}
                       onClick={() => {
+                        if (skipNextClickRef.current) {
+                          skipNextClickRef.current = false;
+                          return;
+                        }
                         triggerBlue();
+                        playSound('pokedex-move');
                         if (!pokemon || !onNavigate) return;
                         const prevId = Math.max(1, pokemon.id - 1);
                         onNavigate(prevId);
@@ -395,12 +433,19 @@ export function PokemonModal({
                       disabled={isFetching || !pokemon || !onNavigate}
                       onPointerDown={(e) => {
                         e.preventDefault();
+                        skipNextClickRef.current = true;
                         triggerGreen();
+                        playSound('pokedex-move');
                         if (!pokemon || !onNavigate) return;
                         onNavigate(pokemon.id + 1);
                       }}
                       onClick={() => {
+                        if (skipNextClickRef.current) {
+                          skipNextClickRef.current = false;
+                          return;
+                        }
                         triggerGreen();
+                        playSound('pokedex-move');
                         if (!pokemon || !onNavigate) return;
                         onNavigate(pokemon.id + 1);
                       }}
@@ -411,9 +456,14 @@ export function PokemonModal({
                       aria-label="Up"
                       onPointerDown={(e) => {
                         e.preventDefault();
+                        skipNextClickRef.current = true;
                         screenRef.current?.scrollBy({ top: -120, behavior: 'smooth' });
                       }}
                       onClick={() => {
+                        if (skipNextClickRef.current) {
+                          skipNextClickRef.current = false;
+                          return;
+                        }
                         screenRef.current?.scrollBy({ top: -120, behavior: 'smooth' });
                       }}
                       className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-10"
@@ -423,9 +473,14 @@ export function PokemonModal({
                       aria-label="Down"
                       onPointerDown={(e) => {
                         e.preventDefault();
+                        skipNextClickRef.current = true;
                         screenRef.current?.scrollBy({ top: 120, behavior: 'smooth' });
                       }}
                       onClick={() => {
+                        if (skipNextClickRef.current) {
+                          skipNextClickRef.current = false;
+                          return;
+                        }
                         screenRef.current?.scrollBy({ top: 120, behavior: 'smooth' });
                       }}
                       className="absolute bottom-0 left-1/2 -translate-x-1/2 w-10 h-10"
