@@ -262,7 +262,8 @@ function SearchBar({
           aria-label="Buscar Pokémon"
           aria-autocomplete="list"
           aria-controls="search-suggestions"
-          aria-expanded={showDropdown}
+          aria-haspopup="listbox"
+          aria-expanded={showDropdown ? 'true' : 'false'}
         />
         {showDropdown && (
           <ul
@@ -271,19 +272,24 @@ function SearchBar({
             id="search-suggestions"
           >
             {filtered.map((s) => (
-              <li key={s.id} role="option">
-                <button
-                  type="button"
-                  className="w-full px-4 py-2.5 text-left hover:bg-slate-100 dark:hover:bg-slate-700 flex justify-between items-center gap-2"
-                  onClick={() => pick(s.name)}
-                >
-                  <span className="font-medium capitalize text-slate-800 dark:text-slate-100">
-                    {s.name.replace(/-/g, ' ')}
-                  </span>
-                  <span className="text-xs text-slate-500 dark:text-slate-400">
-                    #{String(s.id).padStart(3, '0')}
-                  </span>
-                </button>
+              <li
+                key={s.id}
+                role="option"
+                tabIndex={0}
+                className="px-4 py-2.5 text-left hover:bg-slate-100 dark:hover:bg-slate-700 flex justify-between items-center gap-2 cursor-pointer"
+                onClick={() => pick(s.name)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    pick(s.name);
+                  }
+                }}
+              >
+                <span className="font-medium capitalize text-slate-800 dark:text-slate-100">
+                  {s.name.replace(/-/g, ' ')}
+                </span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">
+                  #{String(s.id).padStart(3, '0')}
+                </span>
               </li>
             ))}
           </ul>
