@@ -14,6 +14,7 @@ export interface Pokemon {
   imageShiny: string | null;
   types: string[];
   speciesUrl: string;
+  moves: string[];
 }
 
 /** Nodo del árbol de evolución */
@@ -47,6 +48,7 @@ export function mapPokemonFromApi(api: PokeApiPokemon): Pokemon {
     imageShiny,
     types: api.types.map((t) => t.type.name),
     speciesUrl: api.species.url,
+    moves: api.moves ? api.moves.map((m) => m.move.name) : [],
   };
 }
 

@@ -33,6 +33,7 @@ export interface PokeApiPokemon {
   sprites: PokeApiSprites;
   types: PokeApiTypeRef[];
   species: { name: string; url: string };
+  moves: Array<{ move: { name: string; url: string } }>;
 }
 
 export interface PokeApiSpecies {
@@ -54,5 +55,13 @@ export interface PokeApiEvolutionChain {
 export interface PokeApiType {
   id: number;
   name: string;
+  damage_relations?: {
+    double_damage_from: Array<{ name: string; url: string }>;
+    half_damage_from: Array<{ name: string; url: string }>;
+    no_damage_from: Array<{ name: string; url: string }>;
+    double_damage_to?: Array<{ name: string; url: string }>;
+    half_damage_to?: Array<{ name: string; url: string }>;
+    no_damage_to?: Array<{ name: string; url: string }>;
+  };
   pokemon: Array<{ pokemon: PokeApiPokemonListItem; slot: number }>;
 }

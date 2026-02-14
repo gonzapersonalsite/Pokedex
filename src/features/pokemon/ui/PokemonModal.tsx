@@ -1,12 +1,14 @@
-import { Dialog, Transition } from '@headlessui/react';
+import { Dialog, Transition, Disclosure } from '@headlessui/react';
 import { Fragment } from 'react';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import { useQueries } from '@tanstack/react-query';
+import { XMarkIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 import { usePokemonDetails, useEvolutionTree } from '../model';
 import { useFavoritesStore } from '@/store/favorites';
 import { Button, toast } from '@/shared/ui';
 import { Loader } from '@/shared/ui';
 import type { EvolutionNode } from '@/entities/pokemon';
 import { cn, getTypeBadgeClass } from '@/shared/utils';
+import { pokemonApi } from '../lib/pokemonApi';
 
 export interface PokemonModalProps {
   pokemonIdOrName: number | string | null;
@@ -26,6 +28,46 @@ export function PokemonModal({
   const { favorites, toggle } = useFavoritesStore();
 
   const isFavorite = pokemon ? favorites.includes(pokemon.id) : false;
+
+  const typeQueries = useQueries({
+    queries:
+      pokemon?.types.map((t) => ({
+        queryKey: ['types', 'damage', t],
+        queryFn: () => pokemonApi.typeByIdOrName(t),
+        enabled: !!pokemon,
+        staleTime: 1000 * 60 * 60,
+      })) ?? [],
+  });
+
+  const weaknesses = (() => {
+    const details = typeQueries.map((q) => q.data).filter(Boolean) as Array<{
+      name: string;
+      damage_relations?: {
+        double_damage_from: Array<{ name: string }>;
+        half_damage_from: Array<{ name: string }>;
+        no_damage_from: Array<{ name: string }>;
+      };
+    }>;
+    if (!details.length) return [];
+    const mult = new Map<string, number>();
+    for (const d of details) {
+      const dr = d.damage_relations;
+      if (!dr) continue;
+      for (const it of dr.double_damage_from) {
+        mult.set(it.name, (mult.get(it.name) ?? 1) * 2);
+      }
+      for (const it of dr.half_damage_from) {
+        mult.set(it.name, (mult.get(it.name) ?? 1) * 0.5);
+      }
+      for (const it of dr.no_damage_from) {
+        mult.set(it.name, 0);
+      }
+    }
+    const result = Array.from(mult.entries())
+      .filter(([, v]) => v > 1)
+      .sort((a, b) => b[1] - a[1]);
+    return result;
+  })();
 
   return (
     <Transition show={open} as={Fragment}>
@@ -51,7 +93,7 @@ export function PokemonModal({
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <Dialog.Panel className="mx-auto w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-xl">
+            <Dialog.Panel className="relative mx-auto w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-xl">
               <div className="sticky top-0 flex justify-end p-2 bg-white/90 dark:bg-slate-900/90 z-10">
                 <Button
                   variant="ghost"
@@ -74,8 +116,8 @@ export function PokemonModal({
                 {pokemon && (
                   <>
                     {isFetching && (
-                      <div className="absolute top-2 right-2">
-                        <Loader />
+                      <div className="absolute inset-0 z-20 rounded-2xl bg-black/10 dark:bg-black/20 backdrop-blur-[1px] flex items-center justify-center pointer-events-none">
+                        <Loader className="p-4" />
                       </div>
                     )}
                     <div className="text-center">
@@ -115,6 +157,56 @@ export function PokemonModal({
                           <p className="font-medium">{pokemon.weight / 10} kg</p>
                         </div>
                       </div>
+                      {weaknesses.length > 0 && (
+                        <div className="mt-6 text-left">
+                          <h3 className="font-semibold text-slate-800 dark:text-slate-100 mb-2">
+                            Debilidades
+                          </h3>
+                          <div className="flex flex-wrap gap-2">
+                            {weaknesses.map(([type, factor]) => (
+                              <span
+                                key={type}
+                                className={cn(
+                                  'text-sm font-medium px-3 py-1 rounded-full capitalize',
+                                  getTypeBadgeClass(type)
+                                )}
+                                title={`x${factor.toFixed(1)}`}
+                              >
+                                {type} ×{factor.toFixed(1)}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {pokemon.moves.length > 0 && (
+                        <Disclosure>
+                          {({ open }) => (
+                            <div className="mt-6 text-left">
+                              <Disclosure.Button className="w-full flex items-center justify-between rounded-lg bg-slate-100 dark:bg-slate-800 px-4 py-2 text-left font-semibold text-slate-800 dark:text-slate-100">
+                                <span>Movimientos</span>
+                                <ChevronDownIcon
+                                  className={cn(
+                                    'w-5 h-5 transition-transform',
+                                    open ? 'rotate-180' : ''
+                                  )}
+                                />
+                              </Disclosure.Button>
+                              <Disclosure.Panel>
+                                <ul className="grid grid-cols-2 gap-2 p-3">
+                                  {pokemon.moves.slice(0, 12).map((m) => (
+                                    <li
+                                      key={m}
+                                      className="text-sm capitalize px-3 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100"
+                                    >
+                                      {m.replace(/-/g, ' ')}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </Disclosure.Panel>
+                            </div>
+                          )}
+                        </Disclosure>
+                      )}
                       <Button
                         variant={isFavorite ? 'secondary' : 'primary'}
                         size="sm"

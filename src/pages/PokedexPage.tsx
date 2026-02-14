@@ -263,7 +263,7 @@ function SearchBar({
           aria-autocomplete="list"
           aria-controls="search-suggestions"
           aria-haspopup="listbox"
-          aria-expanded={showDropdown ? 'true' : 'false'}
+          aria-expanded={!!showDropdown}
         />
         {showDropdown && (
           <ul
