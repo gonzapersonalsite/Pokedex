@@ -1,6 +1,6 @@
 # Pokédex
 
-Español | [English](../../README.md)
+🇪🇸 Español | [🇬🇧 English](../../README.md)
 
 Pokédex moderna construida con React + Vite + TypeScript. Arquitectura por features y separación contenedor/presentacional. Datos con TanStack Query, estado con Zustand, estilos con Tailwind, iconos con Heroicons. Incluye sistema global de toasts y PWA.
 
