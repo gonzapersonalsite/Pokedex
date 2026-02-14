@@ -32,6 +32,16 @@ export function PokemonModal({
   onNavigate,
 }: PokemonModalProps) {
   const [scan, setScan] = useState(false);
+  const [blinkBlue, setBlinkBlue] = useState(false);
+  const [blinkGreen, setBlinkGreen] = useState(false);
+  const triggerBlue = () => {
+    setBlinkBlue(true);
+    setTimeout(() => setBlinkBlue(false), 260);
+  };
+  const triggerGreen = () => {
+    setBlinkGreen(true);
+    setTimeout(() => setBlinkGreen(false), 260);
+  };
   useEffect(() => {
     if (open) {
       setScan(true);
@@ -163,6 +173,7 @@ export function PokemonModal({
                           aria-label="Previous Pokémon"
                           title="Previous Pokémon"
                           disabled={isFetching || pokemon.id <= 1}
+                          onPointerDown={() => triggerBlue()}
                           onClick={() => {
                             const prevId = Math.max(1, pokemon.id - 1);
                             onNavigate(prevId);
@@ -176,6 +187,7 @@ export function PokemonModal({
                           aria-label="Next Pokémon"
                           title="Next Pokémon"
                           disabled={isFetching}
+                          onPointerDown={() => triggerGreen()}
                           onClick={() => onNavigate(pokemon.id + 1)}
                     className="flex items-center justify-center absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/80 dark:bg-slate-800/80 shadow hover:bg-white dark:hover:bg-slate-700 transition disabled:opacity-50 hint-loop"
                         >
@@ -348,8 +360,8 @@ export function PokemonModal({
                     aria-label="Close"
                   />
                   <div className="flex gap-3">
-                    <div className="w-14 h-3 bg-blue-900 rounded-sm border border-black/40 shadow-inner" />
-                    <div className="w-14 h-3 bg-green-900 rounded-sm border border-black/40 shadow-inner" />
+                    <div className={cn('w-14 h-3 bg-blue-900 rounded-sm border border-black/40 shadow-inner', blinkBlue && 'led-blink-blue')} />
+                    <div className={cn('w-14 h-3 bg-green-900 rounded-sm border border-black/40 shadow-inner', blinkGreen && 'led-blink-green')} />
                   </div>
                   <div
                     className={cn('relative w-16 h-16 cursor-pointer hint-loop select-none touch-none')}
@@ -364,11 +376,13 @@ export function PokemonModal({
                       disabled={isFetching || !pokemon || (pokemon && pokemon.id <= 1) || !onNavigate}
                       onPointerDown={(e) => {
                         e.preventDefault();
+                        triggerBlue();
                         if (!pokemon || !onNavigate) return;
                         const prevId = Math.max(1, pokemon.id - 1);
                         onNavigate(prevId);
                       }}
                       onClick={() => {
+                        triggerBlue();
                         if (!pokemon || !onNavigate) return;
                         const prevId = Math.max(1, pokemon.id - 1);
                         onNavigate(prevId);
@@ -381,10 +395,12 @@ export function PokemonModal({
                       disabled={isFetching || !pokemon || !onNavigate}
                       onPointerDown={(e) => {
                         e.preventDefault();
+                        triggerGreen();
                         if (!pokemon || !onNavigate) return;
                         onNavigate(pokemon.id + 1);
                       }}
                       onClick={() => {
+                        triggerGreen();
                         if (!pokemon || !onNavigate) return;
                         onNavigate(pokemon.id + 1);
                       }}
