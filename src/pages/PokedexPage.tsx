@@ -53,14 +53,14 @@ export function PokedexPage() {
       {/* Header tipo Pokédex: barra superior clara */}
       <header id="top" className="sticky top-0 z-20 border-b-4 border-slate-800 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3">
+          <div className="grid grid-cols-[auto,1fr] grid-rows-[auto,auto] gap-3 sm:grid-cols-[auto,1fr,auto] sm:grid-rows-1 sm:items-center">
+            <div className="flex items-center gap-3 col-start-1 row-start-1 sm:col-start-1 sm:row-start-1 sm:justify-self-start">
               <PokeballIcon size={40} className="shrink-0" />
               <h1 className="text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100">
                 Pokédex
               </h1>
             </div>
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 flex-1 sm:flex-initial sm:min-w-[280px] max-w-xl">
+            <div className="w-full max-w-xl col-span-2 row-start-2 sm:col-start-2 sm:row-start-1 sm:justify-self-center sm:w-auto sm:max-w-2xl sm:mx-auto">
               <SearchBar
                 value={searchQuery}
                 onChange={setSearchQuery}
@@ -73,11 +73,13 @@ export function PokedexPage() {
                 suggestions={allNames}
                 maxSuggestions={SUGGESTIONS_MAX}
               />
+            </div>
+            <div className="flex items-center gap-2 justify-self-end col-span-2 row-start-1 sm:col-start-3 sm:row-start-1 sm:justify-self-end">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={toggleTheme}
-                className="self-start sm:self-center"
+                className="shrink-0"
                 aria-label={theme === 'dark' ? 'Light mode' : 'Dark mode'}
               >
                 {theme === 'dark' ? (
@@ -90,7 +92,7 @@ export function PokedexPage() {
                 <Button
                   variant="secondary"
                   size="sm"
-                  className="self-start sm:self-center"
+                  className="shrink-0 whitespace-nowrap"
                   onClick={async () => {
                     const ev = installEvent;
                     setCanInstall(false);
