@@ -237,7 +237,13 @@ function SearchBar({
 
   return (
     <div className="flex flex-wrap items-center gap-2 w-full" ref={containerRef}>
-      <div className="relative flex-1 min-w-0">
+      <div
+        className="relative flex-1 min-w-0"
+        role="combobox"
+        aria-haspopup="listbox"
+        aria-expanded={showDropdown}
+        aria-controls="search-suggestions"
+      >
         <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none z-10" />
         <input
           type="search"
@@ -260,12 +266,13 @@ function SearchBar({
           className="w-full pl-10 pr-4 py-2.5 rounded-xl border-2 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           aria-label="Buscar Pokémon"
           aria-autocomplete="list"
-          aria-expanded={showDropdown}
+          aria-controls="search-suggestions"
         />
         {showDropdown && (
           <ul
             className="absolute top-full left-0 right-0 mt-1 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 shadow-lg max-h-[240px] overflow-y-auto z-50"
             role="listbox"
+            id="search-suggestions"
           >
             {filtered.map((s) => (
               <li key={s.id} role="option">

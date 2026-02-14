@@ -30,10 +30,17 @@ export function PokemonCard({
       )}
       data-testid="pokemon-card"
     >
-      <button
-        type="button"
+      <div
+        role="button"
+        tabIndex={0}
         className="w-full text-left focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-inset rounded-2xl"
         onClick={() => onClick?.(pokemon.id)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onClick?.(pokemon.id);
+          }
+        }}
         aria-label={`Ver detalles de ${displayName}`}
       >
         {/* Zona imagen: proporción fija, sin recortar contenido de abajo */}
@@ -91,7 +98,7 @@ export function PokemonCard({
             ))}
           </div>
         </div>
-      </button>
+      </div>
     </article>
   );
 }
