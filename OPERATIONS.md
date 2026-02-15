@@ -7,7 +7,8 @@
 [![TanStack Query](https://img.shields.io/badge/TanStack%20Query-5-FF4154)](https://tanstack.com/query/latest)
 [![Zustand](https://img.shields.io/badge/Zustand-5-000000)](https://zustand-demo.pmnd.rs/)
 [![Vitest](https://img.shields.io/badge/Vitest-2.1-729b1b?logo=vitest)](https://vitest.dev/)
-[![PWA](https://img.shields.io/badge/PWA-Ready-3A7D44)](https://vite-pwa-org.netlify.app/)
+[![PWA](https://img.shields.io/badge/PWA-Ready-3A7D44)](https://github.com/vite-pwa/vite-plugin-pwa)
+[![Evaluation-Only](https://img.shields.io/badge/-Evaluation--Only-red)](LICENSE)
 
 🇬🇧 English | [🇪🇸 Español](docs/es/OPERATIONS.md)
 
