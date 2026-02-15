@@ -63,6 +63,14 @@ export function PokemonList({ onSelectPokemon, typeFilter, favoritesOnly = false
     return () => observer.disconnect();
   }, [favoritesOnly, hasNextPage, isFetchingNextPage, fetchNextPage, list.length]);
 
+  if (!favoritesOnly && useFiltered && !isLoadingRefs && typeRefs.length === 0) {
+    return (
+      <div className="py-12 text-center text-slate-500 dark:text-slate-400">
+        There are no Pokémon for the selected type.
+      </div>
+    );
+  }
+
   if (!favoritesOnly && (status === 'pending' || isLoadingRefs)) {
     return <Loader className="min-h-[300px]" />;
   }
@@ -74,14 +82,6 @@ export function PokemonList({ onSelectPokemon, typeFilter, favoritesOnly = false
         role="alert"
       >
         Error: {error?.message ?? 'Could not load the list.'}
-      </div>
-    );
-  }
-
-  if (!favoritesOnly && useFiltered && !isLoadingRefs && typeRefs.length === 0) {
-    return (
-      <div className="py-12 text-center text-slate-500 dark:text-slate-400">
-        There are no Pokémon for the selected type.
       </div>
     );
   }

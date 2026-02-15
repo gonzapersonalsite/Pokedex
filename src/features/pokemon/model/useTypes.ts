@@ -8,11 +8,8 @@ export function useTypes() {
     queryKey: ['pokemon', 'types'],
     queryFn: async () => {
       const res = await pokemonApi.types();
-      const filtered = res.results.filter(
-        (t) => !['unknown', 'stellar', 'shadow'].includes(t.name)
-      );
       const types = await Promise.all(
-        filtered.map((t) => pokemonApi.typeByIdOrName(t.name))
+        res.results.map((t) => pokemonApi.typeByIdOrName(t.name))
       );
       return types.map(mapTypeFromApi);
     },
