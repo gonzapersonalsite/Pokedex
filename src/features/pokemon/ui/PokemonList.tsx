@@ -78,6 +78,14 @@ export function PokemonList({ onSelectPokemon, typeFilter, favoritesOnly = false
     );
   }
 
+  if (!favoritesOnly && useFiltered && !isLoadingRefs && typeRefs.length === 0) {
+    return (
+      <div className="py-12 text-center text-slate-500 dark:text-slate-400">
+        There are no Pokémon for the selected type.
+      </div>
+    );
+  }
+
   if (!favoritesOnly && list.length === 0) {
     return (
       <div className="py-12 text-center text-slate-500 dark:text-slate-400">
