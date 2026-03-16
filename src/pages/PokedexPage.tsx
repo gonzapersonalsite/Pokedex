@@ -436,18 +436,28 @@ function SearchResult({
       </div>
     );
   if (status === 'error') {
-    const message =
-      error?.message?.startsWith('HTTP ')
-        ? 'There is no Pokémon with that name or ID. Try "Pikachu" or "25".'
-        : (error?.message ?? 'We could not find that Pokémon.');
+    const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
+    const isNetwork = !!(error?.message && /failed to fetch/i.test(error.message));
+    const isNotFound = !!(error?.message && /^HTTP 404/.test(error.message));
+    const message = isOffline || isNetwork
+      ? 'You appear to be offline. Check your connection and try again.'
+      : isNotFound
+      ? 'There is no Pokémon with that name or ID. Try "Pikachu" or "25".'
+      : 'Something went wrong. Please try again.';
     return (
       <div className="text-center py-12 px-4">
         <p className="text-slate-700 dark:text-slate-300 mb-2 font-medium">
           {message}
         </p>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
-          Type a name or number in the search or pick a suggestion.
-        </p>
+        {isOffline || isNetwork ? (
+          <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+            Reconnect to the internet and try again.
+          </p>
+        ) : (
+          <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+            Type a name or number in the search or pick a suggestion.
+          </p>
+        )}
         <Button variant="secondary" onClick={onClose}>
           Back to list
         </Button>

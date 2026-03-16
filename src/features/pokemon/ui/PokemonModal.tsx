@@ -245,7 +245,10 @@ export function PokemonModal({
                       )}
                       {status === 'error' && (
                         <p className="text-red-600 dark:text-red-400 py-6">
-                          {error?.message ?? 'Error loading.'}
+                          {(!navigator.onLine ||
+                          (error?.message && /failed to fetch/i.test(error.message)))
+                            ? 'Network unavailable. Check your connection and try again.'
+                            : (error?.message ?? 'Error loading.')}
                         </p>
                       )}
                       {pokemon && (

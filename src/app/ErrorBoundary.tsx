@@ -28,7 +28,7 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="min-h-[50vh] flex flex-col items-center justify-center p-6 text-center">
           <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-2">
-            Algo salió mal
+            Something went wrong
           </h2>
           <p className="text-slate-600 dark:text-slate-400 mb-4 max-w-md">
             {this.state.error.message}
@@ -37,7 +37,7 @@ export class ErrorBoundary extends Component<Props, State> {
             onClick={() => this.setState({ hasError: false, error: null })}
             variant="primary"
           >
-            Reintentar
+            Retry
           </Button>
         </div>
       );

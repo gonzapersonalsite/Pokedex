@@ -81,7 +81,10 @@ export function PokemonList({ onSelectPokemon, typeFilter, favoritesOnly = false
         className="py-12 text-center text-red-600 dark:text-red-400 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900"
         role="alert"
       >
-        Error: {error?.message ?? 'Could not load the list.'}
+        {(!navigator.onLine ||
+        (error?.message && /failed to fetch/i.test(error.message)))
+          ? 'Network unavailable. Check your internet connection and try again.'
+          : `Error: ${error?.message ?? 'Could not load the list.'}`}
       </div>
     );
   }
@@ -111,7 +114,12 @@ export function PokemonList({ onSelectPokemon, typeFilter, favoritesOnly = false
           className="py-12 text-center text-red-600 dark:text-red-400 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900"
           role="alert"
         >
-        Error: {favError instanceof Error ? favError.message : 'Could not load favorites.'}
+        {(!navigator.onLine ||
+        (favError instanceof Error && /failed to fetch/i.test(favError.message)))
+          ? 'Network unavailable. Check your internet connection and try again.'
+          : `Error: ${
+              favError instanceof Error ? favError.message : 'Could not load favorites.'
+            }`}
         </div>
       );
     }
