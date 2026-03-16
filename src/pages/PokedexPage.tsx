@@ -6,6 +6,17 @@ import { cn, getTypeBadgeClass } from '@/shared/utils';
 import { useTheme } from '@/app/providers';
 import { SunIcon, MoonIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
+type BeforeInstallPromptEvent = Event & {
+  prompt: () => Promise<void> | void;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform?: string }>;
+};
+
+declare global {
+  interface WindowEventMap {
+    beforeinstallprompt: BeforeInstallPromptEvent;
+  }
+}
+
 const SUGGESTIONS_MAX = 8;
 
 export function PokedexPage() {
@@ -14,7 +25,7 @@ export function PokedexPage() {
   const [searchSubmitted, setSearchSubmitted] = useState('');
   const [typeFilter, setTypeFilter] = useState<string | null>(null);
   const [showFavorites, setShowFavorites] = useState(false);
-  const [installEvent, setInstallEvent] = useState<any>(null);
+  const [installEvent, setInstallEvent] = useState<BeforeInstallPromptEvent | null>(null);
   const [canInstall, setCanInstall] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const { data: allNames = [] } = usePokemonNames();
@@ -30,7 +41,7 @@ export function PokedexPage() {
   };
 
   useEffect(() => {
-    function onBeforeInstall(e: any) {
+    function onBeforeInstall(e: BeforeInstallPromptEvent) {
       e.preventDefault();
       setInstallEvent(e);
       setCanInstall(true);

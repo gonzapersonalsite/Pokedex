@@ -74,14 +74,6 @@ export function PokemonModal({
     playSound('pokedex-off');
     onClose();
   };
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') closeWithSound();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
   const { data: pokemon, status, error, isFetching } = usePokemonDetails(pokemonIdOrName);
   const { data: evolutionTree } = useEvolutionTree(pokemonIdOrName);
   const { favorites, toggle } = useFavoritesStore();
@@ -136,7 +128,7 @@ export function PokemonModal({
 
   return (
     <Transition show={open} as={Fragment}>
-      <Dialog onClose={() => {}} className="relative z-50">
+      <Dialog onClose={closeWithSound} className="relative z-50">
         {/* 1. BACKDROP MÁS SUAVE */}
         <TransitionChild
           as={Fragment}
@@ -160,7 +152,7 @@ export function PokemonModal({
             leaveFrom="opacity-100 translate-y-0 scale-100 rotate-0"
             leaveTo="opacity-0 translate-y-10 scale-95"
           >
-            <div
+            <DialogPanel
               className="relative flex items-center justify-center p-2 w-full max-w-md sm:max-w-2xl"
               onMouseDown={(e) => e.stopPropagation()}
               onClick={(e) => e.stopPropagation()}
@@ -179,7 +171,7 @@ export function PokemonModal({
                   </div>
                 </div>
                 <div className="bg-[#dedede] p-4 sm:p-6 pb-10 rounded-xl rounded-bl-[40px] border-b-4 border-r-4 border-gray-400 shadow-inner flex flex-col min-h-0">
-                  <DialogPanel
+                  <div
                     ref={screenRef}
                     className="relative mx-auto w-full flex-1 min-h-0 max-h-[58svh] sm:max-h-safe overflow-y-auto overscroll-contain rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border-2 border-black/20 shadow-[inset_0_0_20px_rgba(0,0,0,0.6)]"
                   >
@@ -253,7 +245,7 @@ export function PokemonModal({
                       )}
                       {status === 'error' && (
                         <p className="text-red-600 dark:text-red-400 py-6">
-                          {error?.message ?? 'Error al cargar.'}
+                          {error?.message ?? 'Error loading.'}
                         </p>
                       )}
                       {pokemon && (
@@ -381,7 +373,7 @@ export function PokemonModal({
                         </>
                       )}
                     </div>
-                  </DialogPanel>
+                  </div>
                   <div className="flex justify-between items-center mt-4 px-2">
                     <div className="w-6 h-6 bg-red-600 rounded-full border border-black/20 shadow-md" />
                     <div className="flex gap-4">
@@ -494,7 +486,7 @@ export function PokemonModal({
                   </div>
                 </div>
               </div>
-            </div>
+            </DialogPanel>
           </TransitionChild>
         </div>
       </Dialog>

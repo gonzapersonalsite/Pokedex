@@ -39,7 +39,7 @@ function ToastCard({ item, onClose }: { item: ToastItem; onClose: () => void }) 
         <button
           type="button"
           className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-          aria-label="Cerrar"
+          aria-label="Close"
           onClick={onClose}
         >
           ×

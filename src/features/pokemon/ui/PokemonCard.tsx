@@ -35,7 +35,7 @@ export function PokemonCard({
           type="button"
           className="w-full text-left focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-inset rounded-2xl"
           onClick={() => onClick?.(pokemon.id)}
-          aria-label={`Ver detalles de ${displayName}`}
+          aria-label={`View details of ${displayName}`}
         >
           {/* Zona imagen: proporción fija, sin recortar contenido de abajo */}
           <div className="aspect-square bg-gradient-to-b from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 p-4">

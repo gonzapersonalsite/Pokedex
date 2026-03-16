@@ -29,7 +29,7 @@ export const pokemonApi = {
   /** Detalle de un Pokémon por ID o name */
   byIdOrName(idOrName: string | number) {
     const url = `${BASE}/pokemon/${idOrName}`;
-    return fetchApi<PokeApiPokemon>(url, 'No hay ningún Pokémon con ese nombre o ID.');
+    return fetchApi<PokeApiPokemon>(url, 'There is no Pokémon with that name or ID.');
   },
 
   /** Lista todos los Pokémon (nombre + id) para sugerencias. Máx ~1300. */
