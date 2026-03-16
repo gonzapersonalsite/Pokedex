@@ -7,15 +7,18 @@ const PAGE_SIZE = 24;
 export function usePokemonList() {
   return useInfiniteQuery({
     queryKey: ['pokemon', 'list'],
-    queryFn: async ({ pageParam = 0 }) => {
-      const res = await pokemonApi.list({
-        offset: pageParam as number,
-        limit: PAGE_SIZE,
-      });
+    queryFn: async ({ pageParam = 0, signal }) => {
+      const res = await pokemonApi.list(
+        {
+          offset: pageParam as number,
+          limit: PAGE_SIZE,
+        },
+        { signal }
+      );
       const details = await Promise.all(
         res.results.map((r) => {
           const id = r.url.replace(/.*\/(\d+)\/$/, '$1');
-          return pokemonApi.byIdOrName(id);
+          return pokemonApi.byIdOrName(id, { signal });
         })
       );
       return {

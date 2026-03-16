@@ -9,10 +9,12 @@ import type {
 
 const BASE = 'https://pokeapi.co/api/v2';
 
-async function fetchApi<T>(url: string, friendly404?: string): Promise<T> {
-  const res = await fetch(url);
+type FetchOpts = { friendly404?: string; signal?: AbortSignal };
+
+async function fetchApi<T>(url: string, opts?: FetchOpts): Promise<T> {
+  const res = await fetch(url, { signal: opts?.signal });
   if (!res.ok) {
-    if (res.status === 404 && friendly404) throw new Error(friendly404);
+    if (res.status === 404 && opts?.friendly404) throw new Error(opts.friendly404);
     throw new Error(`HTTP ${res.status}: ${url}`);
   }
   return res.json() as Promise<T>;
@@ -20,23 +22,26 @@ async function fetchApi<T>(url: string, friendly404?: string): Promise<T> {
 
 export const pokemonApi = {
   /** Lista paginada (offset/limit) para infinite scroll */
-  list(params: { offset: number; limit: number }) {
+  list(params: { offset: number; limit: number }, options?: { signal?: AbortSignal }) {
     const { offset, limit } = params;
     const url = `${BASE}/pokemon?offset=${offset}&limit=${limit}`;
-    return fetchApi<PokeApiPaginated<PokeApiPokemonListItem>>(url);
+    return fetchApi<PokeApiPaginated<PokeApiPokemonListItem>>(url, { signal: options?.signal });
   },
 
   /** Detalle de un Pokémon por ID o name */
-  byIdOrName(idOrName: string | number) {
+  byIdOrName(idOrName: string | number, options?: { signal?: AbortSignal }) {
     const url = `${BASE}/pokemon/${idOrName}`;
-    return fetchApi<PokeApiPokemon>(url, 'There is no Pokémon with that name or ID.');
+    return fetchApi<PokeApiPokemon>(url, {
+      friendly404: 'There is no Pokémon with that name or ID.',
+      signal: options?.signal,
+    });
   },
 
   /** Lista todos los Pokémon (nombre + id) para sugerencias. Máx ~1300. */
-  async allNames(): Promise<{ name: string; id: number }[]> {
-    const res = await fetchApi<PokeApiPaginated<PokeApiPokemonListItem>>(
-      `${BASE}/pokemon?limit=2000`
-    );
+  async allNames(options?: { signal?: AbortSignal }): Promise<{ name: string; id: number }[]> {
+    const res = await fetchApi<PokeApiPaginated<PokeApiPokemonListItem>>(`${BASE}/pokemon?limit=2000`, {
+      signal: options?.signal,
+    });
     return res.results.map((r) => {
       const id = parseInt(r.url.replace(/.*\/(\d+)\/$/, '$1'), 10);
       return { name: r.name, id };
@@ -44,26 +49,26 @@ export const pokemonApi = {
   },
 
   /** Especie (para evolution_chain url) */
-  species(idOrName: string | number) {
+  species(idOrName: string | number, options?: { signal?: AbortSignal }) {
     const url = `${BASE}/pokemon-species/${idOrName}`;
-    return fetchApi<PokeApiSpecies>(url);
+    return fetchApi<PokeApiSpecies>(url, { signal: options?.signal });
   },
 
   /** Cadena de evolución por ID de chain (número al final de la URL) */
-  evolutionChain(chainId: number) {
+  evolutionChain(chainId: number, options?: { signal?: AbortSignal }) {
     const url = `${BASE}/evolution-chain/${chainId}`;
-    return fetchApi<{ id: number; chain: PokeApiEvolutionChain['chain'] }>(url);
+    return fetchApi<{ id: number; chain: PokeApiEvolutionChain['chain'] }>(url, { signal: options?.signal });
   },
 
   /** Todos los tipos (para filtro) */
-  types() {
+  types(options?: { signal?: AbortSignal }) {
     const url = `${BASE}/type?limit=100`;
-    return fetchApi<PokeApiPaginated<{ name: string; url: string }>>(url);
+    return fetchApi<PokeApiPaginated<{ name: string; url: string }>>(url, { signal: options?.signal });
   },
 
   /** Tipo por ID o nombre (incluye lista de pokemon de ese tipo) */
-  typeByIdOrName(idOrName: string | number) {
+  typeByIdOrName(idOrName: string | number, options?: { signal?: AbortSignal }) {
     const url = `${BASE}/type/${idOrName}`;
-    return fetchApi<PokeApiType>(url);
+    return fetchApi<PokeApiType>(url, { signal: options?.signal });
   },
 };

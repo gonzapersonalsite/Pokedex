@@ -5,7 +5,7 @@ import { pokemonApi } from '../lib/pokemonApi';
 export function usePokemonNames() {
   return useQuery({
     queryKey: ['pokemon', 'allNames'],
-    queryFn: () => pokemonApi.allNames(),
+    queryFn: ({ signal }) => pokemonApi.allNames({ signal }),
     staleTime: 1000 * 60 * 60,
   });
 }

@@ -6,10 +6,10 @@ import { mapTypeFromApi } from '@/entities/pokemon';
 export function useTypes() {
   return useQuery({
     queryKey: ['pokemon', 'types'],
-    queryFn: async () => {
-      const res = await pokemonApi.types();
+    queryFn: async ({ signal }) => {
+      const res = await pokemonApi.types({ signal });
       const types = await Promise.all(
-        res.results.map((t) => pokemonApi.typeByIdOrName(t.name))
+        res.results.map((t) => pokemonApi.typeByIdOrName(t.name, { signal }))
       );
       return types.map(mapTypeFromApi);
     },

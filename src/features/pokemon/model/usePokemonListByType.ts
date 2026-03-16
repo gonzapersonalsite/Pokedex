@@ -13,9 +13,9 @@ function idFromUrl(url: string): number {
 export function useTypeRefs(typeName: string | null) {
   return useQuery({
     queryKey: ['pokemon', 'typeRefs', typeName],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       if (!typeName) return [];
-      const typeData = await pokemonApi.typeByIdOrName(typeName);
+      const typeData = await pokemonApi.typeByIdOrName(typeName, { signal });
       return typeData.pokemon.map((p) => ({
         id: idFromUrl(p.pokemon.url),
         name: p.pokemon.name,
@@ -32,11 +32,11 @@ export function usePokemonListByType(
 ) {
   return useInfiniteQuery({
     queryKey: ['pokemon', 'byType', typeName, refs.length],
-    queryFn: async ({ pageParam = 0 }) => {
+    queryFn: async ({ pageParam = 0, signal }) => {
       const start = pageParam as number;
       const slice = refs.slice(start, start + PAGE_SIZE);
       const details = await Promise.all(
-        slice.map((r) => pokemonApi.byIdOrName(r.id))
+        slice.map((r) => pokemonApi.byIdOrName(r.id, { signal }))
       );
       return {
         list: details.map(mapPokemonFromApi),
