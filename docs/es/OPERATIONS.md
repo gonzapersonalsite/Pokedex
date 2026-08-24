@@ -15,14 +15,14 @@
 Guía de desarrollo local, build, tests, comportamiento PWA y despliegue del proyecto Pokédex.
 
 ## 🚀 Desarrollo Local
-- Requisitos: Node.js 18+ y npm.
-- Instalar dependencias: `npm ci`
-- Arrancar en modo desarrollo: `npm run dev`
+- Requisitos: Node.js 18+ y pnpm.
+- Instalar dependencias: `pnpm install`
+- Arrancar en modo desarrollo: `pnpm dev`
   - Vite sirve en http://localhost:5173
-- Previsualizar el build de producción: `npm run preview`
+- Previsualizar el build de producción: `pnpm preview`
 - Ejecutar tests:
-  - `npm run test` (CI)
-  - `npm run test:watch` (modo watch local)
+  - `pnpm test` (CI)
+  - `pnpm test:watch` (modo watch local)
 
 ## 🧪 Tests
 - Vitest + Testing Library
@@ -30,15 +30,15 @@ Guía de desarrollo local, build, tests, comportamiento PWA y despliegue del pro
 - Fichero de setup: `src/shared/test/setup.ts`
 
 ## 📦 Build
-- `npm run build`
+- `pnpm build`
 - Salida: `dist/` (assets estáticos)
 
 ## 📱 PWA
 - vite-plugin-pwa con autoUpdate y Service Worker en desarrollo.
 - Workbox: estrategia Network First para `https://pokeapi.co/api/v2/` con caché de respaldo.
 - Probar la PWA localmente:
-  1. `npm run build`
-  2. `npm run preview`
+  1. `pnpm build`
+  2. `pnpm preview`
   3. Abre en el navegador y usa “Install App”.
 
 ## 🔧 Variables de Entorno

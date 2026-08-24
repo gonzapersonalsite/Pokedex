@@ -23,14 +23,14 @@ Pokédex moderna construida con React + Vite + TypeScript. Arquitectura por feat
 - Build PWA.
 
 ## Inicio rápido
-- Instalar: `npm ci`
-- Desarrollo: `npm run dev`
-- Tests: `npm run test`
-- Compilar: `npm run build`
-- Previsualizar: `npm run preview`
+- Instalar: `pnpm install`
+- Desarrollo: `pnpm dev`
+- Tests: `pnpm test`
+- Compilar: `pnpm build`
+- Previsualizar: `pnpm preview`
 
 ## Stack
-- React 18, TypeScript, Vite
+- React 19, TypeScript, Vite
 - TanStack Query, Zustand (persist), TailwindCSS, Heroicons
 - Vitest, Testing Library
 

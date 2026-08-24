@@ -23,14 +23,14 @@ Modern Pokédex built with React + Vite + TypeScript. It uses Feature-Sliced arc
 - PWA build.
 
 ## Getting Started
-- Install: `npm ci`
-- Dev: `npm run dev`
-- Test: `npm run test`
-- Build: `npm run build`
-- Preview: `npm run preview`
+- Install: `pnpm install`
+- Dev: `pnpm dev`
+- Test: `pnpm test`
+- Build: `pnpm build`
+- Preview: `pnpm preview`
 
 ## Tech Stack
-- React 18, TypeScript, Vite
+- React 19, TypeScript, Vite
 - TanStack Query, Zustand (persist), TailwindCSS, Heroicons
 - Vitest, Testing Library
 
