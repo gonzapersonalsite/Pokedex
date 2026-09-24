@@ -2,7 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import { pokemonApi } from '../lib/pokemonApi';
 import { mapTypeFromApi } from '@/entities/pokemon';
 
-/** Lista de tipos para filtros (solo tipos principales, sin "unknown" etc si se desea filtrar). */
+/**
+ * Types offered by the type filter. Types without any Pokémon (PokeAPI lists Shadow,
+ * Stellar and Unknown) are left out, since selecting them could only show an empty list.
+ */
 export function useTypes() {
   return useQuery({
     queryKey: ['pokemon', 'types'],
@@ -11,7 +14,7 @@ export function useTypes() {
       const types = await Promise.all(
         res.results.map((t) => pokemonApi.typeByIdOrName(t.name, { signal }))
       );
-      return types.map(mapTypeFromApi);
+      return types.filter((t) => t.pokemon.length > 0).map(mapTypeFromApi);
     },
   });
 }
