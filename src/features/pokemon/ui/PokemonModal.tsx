@@ -16,7 +16,7 @@ import { Button, toast } from '@/shared/ui';
 import { Loader } from '@/shared/ui';
 import { useAudio } from '@/hooks/useAudio';
 import type { EvolutionNode } from '@/entities/pokemon';
-import { cn, getTypeBadgeClass, scrollToTop } from '@/shared/utils';
+import { classifyRequestError, cn, getTypeBadgeClass, scrollToTop } from '@/shared/utils';
 import { pokemonApi } from '../lib/pokemonApi';
 
 export interface PokemonModalProps {
@@ -245,8 +245,7 @@ export function PokemonModal({
                       )}
                       {status === 'error' && (
                         <p className="text-red-600 dark:text-red-400 py-6">
-                          {(!navigator.onLine ||
-                          (error?.message && /failed to fetch/i.test(error.message)))
+                          {classifyRequestError(error) === 'network'
                             ? 'Network unavailable. Check your connection and try again.'
                             : (error?.message ?? 'Error loading.')}
                         </p>

@@ -6,6 +6,7 @@ import type {
   PokeApiEvolutionChain,
   PokeApiType,
 } from '@/entities/pokemon';
+import { HttpError } from '@/shared/utils';
 
 const BASE = 'https://pokeapi.co/api/v2';
 
@@ -14,8 +15,9 @@ type FetchOpts = { friendly404?: string; signal?: AbortSignal };
 async function fetchApi<T>(url: string, opts?: FetchOpts): Promise<T> {
   const res = await fetch(url, { signal: opts?.signal });
   if (!res.ok) {
-    if (res.status === 404 && opts?.friendly404) throw new Error(opts.friendly404);
-    throw new Error(`HTTP ${res.status}: ${url}`);
+    const message =
+      res.status === 404 && opts?.friendly404 ? opts.friendly404 : `HTTP ${res.status}: ${url}`;
+    throw new HttpError(res.status, message);
   }
   return res.json() as Promise<T>;
 }

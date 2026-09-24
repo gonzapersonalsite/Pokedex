@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, Suspense } from 'react';
 import { PokemonList, PokemonModal } from '@/features/pokemon/ui';
 import { usePokemonSearch, usePokemonNames, useTypes } from '@/features/pokemon/model';
 import { Button, Loader, PokeballIcon, toast } from '@/shared/ui';
-import { cn, getTypeBadgeClass } from '@/shared/utils';
+import { classifyRequestError, cn, getTypeBadgeClass, type RequestErrorKind } from '@/shared/utils';
 import { useTheme } from '@/app/providers';
 import { SunIcon, MoonIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
@@ -18,6 +18,23 @@ declare global {
 }
 
 const SUGGESTIONS_MAX = 8;
+
+const SEARCH_RETRY_HINT = 'Type a name or number in the search or pick a suggestion.';
+
+const SEARCH_ERROR_COPY: Record<RequestErrorKind, { message: string; hint: string }> = {
+  network: {
+    message: 'You appear to be offline. Check your connection and try again.',
+    hint: 'Reconnect to the internet and try again.',
+  },
+  notFound: {
+    message: 'There is no Pokémon with that name or ID. Try "Pikachu" or "25".',
+    hint: SEARCH_RETRY_HINT,
+  },
+  other: {
+    message: 'Something went wrong. Please try again.',
+    hint: SEARCH_RETRY_HINT,
+  },
+};
 
 export function PokedexPage() {
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -436,28 +453,15 @@ function SearchResult({
       </div>
     );
   if (status === 'error') {
-    const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
-    const isNetwork = !!(error?.message && /failed to fetch/i.test(error.message));
-    const isNotFound = !!(error?.message && /^HTTP 404/.test(error.message));
-    const message = isOffline || isNetwork
-      ? 'You appear to be offline. Check your connection and try again.'
-      : isNotFound
-      ? 'There is no Pokémon with that name or ID. Try "Pikachu" or "25".'
-      : 'Something went wrong. Please try again.';
+    const { message, hint } = SEARCH_ERROR_COPY[classifyRequestError(error)];
     return (
       <div className="text-center py-12 px-4">
         <p className="text-slate-700 dark:text-slate-300 mb-2 font-medium">
           {message}
         </p>
-        {isOffline || isNetwork ? (
-          <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
-            Reconnect to the internet and try again.
-          </p>
-        ) : (
-          <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
-            Type a name or number in the search or pick a suggestion.
-          </p>
-        )}
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+          {hint}
+        </p>
         <Button variant="secondary" onClick={onClose}>
           Back to list
         </Button>

@@ -4,6 +4,7 @@ import { usePokemonList, useTypeRefs, usePokemonListByType } from '../model';
 import { useFavoritesStore } from '@/store/favorites';
 import { PokemonCard } from './PokemonCard';
 import { Loader, toast } from '@/shared/ui';
+import { classifyRequestError } from '@/shared/utils';
 import { pokemonApi } from '../lib/pokemonApi';
 import { mapPokemonFromApi } from '@/entities/pokemon';
 
@@ -81,8 +82,7 @@ export function PokemonList({ onSelectPokemon, typeFilter, favoritesOnly = false
         className="py-12 text-center text-red-600 dark:text-red-400 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900"
         role="alert"
       >
-        {(!navigator.onLine ||
-        (error?.message && /failed to fetch/i.test(error.message)))
+        {classifyRequestError(error) === 'network'
           ? 'Network unavailable. Check your internet connection and try again.'
           : `Error: ${error?.message ?? 'Could not load the list.'}`}
       </div>
@@ -114,8 +114,7 @@ export function PokemonList({ onSelectPokemon, typeFilter, favoritesOnly = false
           className="py-12 text-center text-red-600 dark:text-red-400 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900"
           role="alert"
         >
-        {(!navigator.onLine ||
-        (favError instanceof Error && /failed to fetch/i.test(favError.message)))
+        {classifyRequestError(favError) === 'network'
           ? 'Network unavailable. Check your internet connection and try again.'
           : `Error: ${
               favError instanceof Error ? favError.message : 'Could not load favorites.'

@@ -38,7 +38,7 @@ src/
 ├── hooks/               # Reusable React hooks (useAudio)
 ├── pages/
 │   └── PokedexPage.tsx  # Page composition (filters, favorites, list, modal)
-├── shared/              # UI primitives (Button, Loader, Toast), utils (cn, typeBadge, audioManager, scroll), tests setup
+├── shared/              # UI primitives (Button, Loader, Toast), utils (cn, typeBadge, audioManager, scroll, requestError), tests setup
 ├── store/               # Global stores (favorites, toast)
 ├── types/               # Type declarations (virtual:pwa-register)
 └── main.tsx
@@ -47,6 +47,7 @@ src/
 ### Data & API
 - External API: PokeAPI (read-only GET endpoints).
 - Query Provider centralizes caching, stale time, retries, and global error toasts (through the `QueryCache` `onError` handler).
+- Failed requests are classified in one place (`shared/utils/requestError.ts`: network, not found or other). The global toasts, the retry policy (a 404 is never retried) and the inline error messages all rely on it.
 - This guide avoids duplicating endpoint lists; see README for example endpoints and the code in features/pokemon/lib.
 
 ### State Management
