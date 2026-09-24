@@ -1,4 +1,4 @@
-# Pokedex
+# Pokédex
 
 [![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=white)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -14,6 +14,8 @@
 
 Modern Pokédex built with React + Vite + TypeScript. It uses Feature-Sliced architecture and a container/presentational split. Data fetching with TanStack Query, state with Zustand, styling with Tailwind, icons with Heroicons. Includes a global toast system and a PWA.
 
+**Live demo:** [pokedex-pokeapi-gonzalo.vercel.app](https://pokedex-pokeapi-gonzalo.vercel.app/)
+
 ## Features
 - Infinite scroll list with type filter.
 - Favorites: toggle in cards and details, and a “Favorites” filter to list only your saved Pokémon.
@@ -23,7 +25,7 @@ Modern Pokédex built with React + Vite + TypeScript. It uses Feature-Sliced arc
 - PWA build.
 
 ## Getting Started
-- Install: `pnpm install`
+- Install: `pnpm install --frozen-lockfile --ignore-scripts`
 - Dev: `pnpm dev`
 - Test: `pnpm test`
 - Build: `pnpm build`

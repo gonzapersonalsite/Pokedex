@@ -12,7 +12,7 @@
 
 🇪🇸 Español | [🇬🇧 English](../../ARCHITECTURE.md)
 
-Este documento resume los patrones arquitectónicos, principios de diseño y decisiones tecnológicas del proyecto Pokedex.
+Este documento resume los patrones arquitectónicos, principios de diseño y decisiones tecnológicas del proyecto Pokédex.
 
 ## 🏗️ Arquitectura y Principios
 - Organización por features con clara separación de responsabilidades.
@@ -35,10 +35,12 @@ src/
 ├── entities/            # Modelos de dominio (Pokemon, EvolutionNode, TypeOption)
 ├── features/
 │   └── pokemon/         # API, hooks (lista, búsqueda, detalles, tipos, evolución), UI (card, lista, modal)
+├── hooks/               # Hooks de React reutilizables (useAudio)
 ├── pages/
 │   └── PokedexPage.tsx  # Composición de página (filtros, favoritos, lista, modal)
 ├── shared/              # UI (Button, Loader, Toast), utils (cn, typeBadge), setup tests
 ├── store/               # Stores globales (favorites, toast)
+├── types/               # Declaraciones de tipos (virtual:pwa-register)
 └── main.tsx
 ```
 

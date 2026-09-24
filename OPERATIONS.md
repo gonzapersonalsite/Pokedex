@@ -12,16 +12,16 @@
 
 🇬🇧 English | [🇪🇸 Español](docs/es/OPERATIONS.md)
 
-Covers local development, build, testing, PWA behavior, and deployment for the Pokedex project.
+Covers local development, build, testing, PWA behavior, and deployment for the Pokédex project.
 
 ## 🚀 Local Development
 - Prerequisites: a current Node.js LTS release and pnpm.
-- Install: `pnpm install`
+- Install: `pnpm install --frozen-lockfile --ignore-scripts` (exact lockfile versions, no dependency lifecycle scripts)
 - Start dev server: `pnpm dev`
   - Vite serves at http://localhost:5173
 - Preview production build: `pnpm preview`
 - Run tests:
-  - `pnpm test` (CI)
+  - `pnpm test` (single run)
   - `pnpm test:watch` (local watch mode)
 
 ## 🧪 Testing
@@ -37,6 +37,11 @@ Covers local development, build, testing, PWA behavior, and deployment for the P
 - vite-plugin-pwa with autoUpdate and dev SW enabled.
 - Workbox: Network First for `https://pokeapi.co/api/v2/` with cache fallback.
 - To test PWA locally: build, then `pnpm preview`, and “Install App” in the browser.
+
+## 🌐 Deployment
+- Vercel deploys every push to `main` to production: https://pokedex-pokeapi-gonzalo.vercel.app/
+- The build runs in Vercel's GitHub integration; the repository has no deploy scripts or workflows.
+- Each deployment's result shows up on the commit as the `Vercel` GitHub status.
 
 ## 🔧 Environment Variables
 - None required for PokeAPI usage.

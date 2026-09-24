@@ -14,16 +14,18 @@
 
 Pokédex moderna construida con React + Vite + TypeScript. Arquitectura por features y separación contenedor/presentacional. Datos con TanStack Query, estado con Zustand, estilos con Tailwind, iconos con Heroicons. Incluye sistema global de toasts y PWA.
 
+**Demo en directo:** [pokedex-pokeapi-gonzalo.vercel.app](https://pokedex-pokeapi-gonzalo.vercel.app/)
+
 ## Funcionalidades
 - Lista con scroll infinito y filtro por tipo.
 - Favoritos: se pueden alternar en tarjetas y detalle; filtro “Favoritos” para ver solo guardados.
-+- Búsqueda por nombre o ID con loader centrado.
+- Búsqueda por nombre o ID con loader centrado.
 - Modal de detalles con cadena de evolución y navegación entre evoluciones dentro del modal.
 - Notificaciones toast globales (esquina superior derecha, bajo el navbar).
 - Build PWA.
 
 ## Inicio rápido
-- Instalar: `pnpm install`
+- Instalar: `pnpm install --frozen-lockfile --ignore-scripts`
 - Desarrollo: `pnpm dev`
 - Tests: `pnpm test`
 - Compilar: `pnpm build`

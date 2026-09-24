@@ -16,12 +16,12 @@ Guía de desarrollo local, build, tests, comportamiento PWA y despliegue del pro
 
 ## 🚀 Desarrollo Local
 - Requisitos: una versión LTS actual de Node.js y pnpm.
-- Instalar dependencias: `pnpm install`
+- Instalar dependencias: `pnpm install --frozen-lockfile --ignore-scripts` (versiones exactas del lockfile, sin scripts de ciclo de vida de las dependencias)
 - Arrancar en modo desarrollo: `pnpm dev`
   - Vite sirve en http://localhost:5173
 - Previsualizar el build de producción: `pnpm preview`
 - Ejecutar tests:
-  - `pnpm test` (CI)
+  - `pnpm test` (ejecución única)
   - `pnpm test:watch` (modo watch local)
 
 ## 🧪 Tests
@@ -40,6 +40,11 @@ Guía de desarrollo local, build, tests, comportamiento PWA y despliegue del pro
   1. `pnpm build`
   2. `pnpm preview`
   3. Abre en el navegador y usa “Install App”.
+
+## 🌐 Despliegue
+- Vercel despliega en producción cada push a `main`: https://pokedex-pokeapi-gonzalo.vercel.app/
+- El build se ejecuta en la integración de Vercel con GitHub; el repositorio no tiene scripts ni workflows de despliegue.
+- El resultado de cada despliegue aparece en el commit como el estado `Vercel` de GitHub.
 
 ## 🔧 Variables de Entorno
 - No se requieren variables para usar PokeAPI.
