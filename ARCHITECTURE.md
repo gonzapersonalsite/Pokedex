@@ -44,7 +44,7 @@ src/
 
 ### Data & API
 - External API: PokeAPI (read-only GET endpoints).
-- Query Provider centralizes caching, stale time, and retries.
+- Query Provider centralizes caching, stale time, retries, and global error toasts (through the `QueryCache` `onError` handler).
 - This guide avoids duplicating endpoint lists; see README for example endpoints and the code in features/pokemon/lib.
 
 ### State Management

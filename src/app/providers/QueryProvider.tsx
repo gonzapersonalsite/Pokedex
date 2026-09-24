@@ -1,15 +1,16 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { type ReactNode, useState } from 'react';
 import { toast } from '@/shared/ui';
 
-const networkToastState = { lastAt: 0 };
+const NETWORK_TOAST_COOLDOWN_MS = 8000;
 
-const defaultOptions = {
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5,
-      retry: 2,
-      onError: (err: unknown) => {
+function createQueryClient() {
+  let lastNetworkToastAt = 0;
+
+  return new QueryClient({
+    // TanStack Query v5 ignores onError in defaultOptions.queries; the QueryCache is the global hook.
+    queryCache: new QueryCache({
+      onError: (err) => {
         const raw = err instanceof Error ? err.message : String(err ?? '');
         const offline = typeof navigator !== 'undefined' && !navigator.onLine;
         const isNetwork = /failed to fetch/i.test(raw);
@@ -17,8 +18,8 @@ const defaultOptions = {
         if (isNotFound) return;
         if (offline || isNetwork) {
           const now = Date.now();
-          if (now - networkToastState.lastAt < 8000) return;
-          networkToastState.lastAt = now;
+          if (now - lastNetworkToastAt < NETWORK_TOAST_COOLDOWN_MS) return;
+          lastNetworkToastAt = now;
           toast({
             variant: 'error',
             title: 'Network error',
@@ -32,22 +33,28 @@ const defaultOptions = {
           message: raw || 'Unexpected error',
         });
       },
-    },
-    mutations: {
-      onError: (err: unknown) => {
-        const message = err instanceof Error ? err.message : 'Unexpected error';
-        toast({
-          variant: 'error',
-          title: 'Operation failed',
-          message,
-        });
+    }),
+    defaultOptions: {
+      queries: {
+        staleTime: 1000 * 60 * 5,
+        retry: 2,
+      },
+      mutations: {
+        onError: (err: unknown) => {
+          const message = err instanceof Error ? err.message : 'Unexpected error';
+          toast({
+            variant: 'error',
+            title: 'Operation failed',
+            message,
+          });
+        },
       },
     },
-  },
-};
+  });
+}
 
 export function QueryProvider({ children }: { children: ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient(defaultOptions));
+  const [queryClient] = useState(createQueryClient);
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );

@@ -44,7 +44,7 @@ src/
 
 ### Datos y API
 - API externa: PokeAPI (endpoints de solo lectura mediante GET).
-- El Query Provider centraliza caché, tiempos de frescura y reintentos.
+- El Query Provider centraliza caché, tiempos de frescura, reintentos y los toasts de error globales (mediante el handler `onError` de `QueryCache`).
 - Esta guía evita duplicar listados de endpoints; ver README para ejemplos y el código en `features/pokemon/lib`.
 
 ### Gestión de Estado
