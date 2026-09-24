@@ -1,12 +1,12 @@
 # 🛠️ Guía de Operaciones
 
-[![React](https://img.shields.io/badge/React-19.0-61DAFB?logo=react)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript)](https://www.typescriptlang.org/)
-[![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite)](https://vitejs.dev/)
-[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-06B6D4?logo=tailwindcss)](https://tailwindcss.com/)
-[![TanStack Query](https://img.shields.io/badge/TanStack%20Query-5-FF4154)](https://tanstack.com/query/latest)
-[![Zustand](https://img.shields.io/badge/Zustand-5-000000)](https://zustand-demo.pmnd.rs/)
-[![Vitest](https://img.shields.io/badge/Vitest-2.1-729b1b?logo=vitest)](https://vitest.dev/)
+[![React](https://img.shields.io/badge/React-61DAFB?logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite)](https://vitejs.dev/)
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-06B6D4?logo=tailwindcss)](https://tailwindcss.com/)
+[![TanStack Query](https://img.shields.io/badge/TanStack%20Query-FF4154)](https://tanstack.com/query/latest)
+[![Zustand](https://img.shields.io/badge/Zustand-000000)](https://zustand-demo.pmnd.rs/)
+[![Vitest](https://img.shields.io/badge/Vitest-729b1b?logo=vitest)](https://vitest.dev/)
 [![PWA](https://img.shields.io/badge/PWA-Ready-3A7D44)](https://github.com/vite-pwa/vite-plugin-pwa)
 [![License: Evaluation Only](https://img.shields.io/badge/License-Evaluation--Only-red)](../../LICENSE)
 
@@ -15,7 +15,7 @@
 Guía de desarrollo local, build, tests, comportamiento PWA y despliegue del proyecto Pokédex.
 
 ## 🚀 Desarrollo Local
-- Requisitos: Node.js 18+ y pnpm.
+- Requisitos: una versión LTS actual de Node.js y pnpm.
 - Instalar dependencias: `pnpm install`
 - Arrancar en modo desarrollo: `pnpm dev`
   - Vite sirve en http://localhost:5173
