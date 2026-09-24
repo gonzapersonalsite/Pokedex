@@ -11,8 +11,25 @@ export class HttpError extends Error {
 
 export type RequestErrorKind = 'network' | 'notFound' | 'other';
 
+/**
+ * The Fetch spec only says fetch() rejects with a TypeError when it gets no response
+ * (DNS failure, refused or dropped connection, CORS block); each engine words it differently.
+ */
+const FETCH_NETWORK_FAILURE_MESSAGES = [
+  'Failed to fetch', // Chromium (Chrome, Edge)
+  'NetworkError when attempting to fetch resource.', // Gecko (Firefox)
+  'Load failed', // WebKit (Safari)
+];
+
 function isOffline(): boolean {
   return typeof navigator !== 'undefined' && !navigator.onLine;
+}
+
+function isFetchNetworkFailure(error: unknown): boolean {
+  return (
+    error instanceof TypeError &&
+    FETCH_NETWORK_FAILURE_MESSAGES.some((message) => error.message.includes(message))
+  );
 }
 
 /**
@@ -22,6 +39,6 @@ function isOffline(): boolean {
 export function classifyRequestError(error: unknown): RequestErrorKind {
   if (error instanceof HttpError && error.status === 404) return 'notFound';
   if (isOffline()) return 'network';
-  if (error instanceof Error && /failed to fetch/i.test(error.message)) return 'network';
+  if (isFetchNetworkFailure(error)) return 'network';
   return 'other';
 }

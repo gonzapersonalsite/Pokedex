@@ -12,8 +12,22 @@ describe('classifyRequestError', () => {
     );
   });
 
-  it('treats a fetch that cannot reach the server as a network error', () => {
-    expect(classifyRequestError(new TypeError('Failed to fetch'))).toBe('network');
+  // The TypeError message each engine's fetch() rejects with when it gets no response.
+  it.each([
+    ['Chromium', 'Failed to fetch'],
+    ['Gecko (Firefox)', 'NetworkError when attempting to fetch resource.'],
+    ['WebKit (Safari)', 'Load failed'],
+  ])('treats a fetch that cannot reach the server in %s as a network error', (_engine, message) => {
+    expect(classifyRequestError(new TypeError(message))).toBe('network');
+  });
+
+  it('does not treat an aborted request or an unrelated TypeError as a network error', () => {
+    expect(classifyRequestError(new DOMException('signal is aborted without reason', 'AbortError'))).toBe(
+      'other'
+    );
+    expect(classifyRequestError(new TypeError("Cannot read properties of undefined (reading 'map')"))).toBe(
+      'other'
+    );
   });
 
   it('treats any failure while the browser is offline as a network error', () => {
