@@ -18,17 +18,23 @@ describe('QueryProvider', () => {
     useToastStore.getState().clear();
   });
 
-  it('shows a "Request failed" toast when a query fails', async () => {
-    const message = 'HTTP 500: https://pokeapi.co/api/v2/type';
-    renderHook(() => useFailingQuery('server-error', new HttpError(500, message)), {
-      wrapper: QueryProvider,
-    });
-
-    await waitFor(() =>
-      expect(useToastStore.getState().toasts).toEqual([
-        expect.objectContaining({ variant: 'error', title: 'Request failed', message }),
-      ])
+  it('shows a single "Request failed" toast, without the raw URL, when several queries fail together', async () => {
+    const { result } = renderHook(
+      () => [
+        useFailingQuery('server-error-a', new HttpError(500, 'HTTP 500: https://pokeapi.co/api/v2/type')),
+        useFailingQuery('server-error-b', new HttpError(429, 'HTTP 429: https://pokeapi.co/api/v2/pokemon/25')),
+      ],
+      { wrapper: QueryProvider }
     );
+
+    await waitFor(() => expect(result.current.every((q) => q.isError)).toBe(true));
+    expect(useToastStore.getState().toasts).toEqual([
+      expect.objectContaining({
+        variant: 'error',
+        title: 'Request failed',
+        message: 'Could not load Pokémon data. Please try again in a moment.',
+      }),
+    ]);
   });
 
   it('shows a single "Network error" toast when several queries cannot reach the network', async () => {

@@ -1,13 +1,27 @@
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { type ReactNode, useState } from 'react';
 import { toast } from '@/shared/ui';
-import { classifyRequestError } from '@/shared/utils';
+import { classifyRequestError, type RequestErrorKind } from '@/shared/utils';
 
-const NETWORK_TOAST_COOLDOWN_MS = 8000;
+const ERROR_TOAST_COOLDOWN_MS = 8000;
 const MAX_QUERY_RETRIES = 2;
 
+type ToastedErrorKind = Exclude<RequestErrorKind, 'notFound'>;
+
+const ERROR_TOASTS: Record<ToastedErrorKind, { title: string; message: string }> = {
+  network: {
+    title: 'Network error',
+    message: 'You appear to be offline. Check your connection and try again.',
+  },
+  other: {
+    title: 'Request failed',
+    message: 'Could not load Pokémon data. Please try again in a moment.',
+  },
+};
+
 function createQueryClient() {
-  let lastNetworkToastAt = 0;
+  // One cooldown per kind, so a burst of failing queries (an outage or a 429) shows a single toast.
+  const lastToastAt: Record<ToastedErrorKind, number> = { network: 0, other: 0 };
 
   return new QueryClient({
     // TanStack Query v5 ignores onError in defaultOptions.queries; the QueryCache is the global hook.
@@ -15,23 +29,10 @@ function createQueryClient() {
       onError: (err) => {
         const kind = classifyRequestError(err);
         if (kind === 'notFound') return;
-        if (kind === 'network') {
-          const now = Date.now();
-          if (now - lastNetworkToastAt < NETWORK_TOAST_COOLDOWN_MS) return;
-          lastNetworkToastAt = now;
-          toast({
-            variant: 'error',
-            title: 'Network error',
-            message: 'You appear to be offline. Check your connection and try again.',
-          });
-          return;
-        }
-        const raw = err instanceof Error ? err.message : String(err ?? '');
-        toast({
-          variant: 'error',
-          title: 'Request failed',
-          message: raw || 'Unexpected error',
-        });
+        const now = Date.now();
+        if (now - lastToastAt[kind] < ERROR_TOAST_COOLDOWN_MS) return;
+        lastToastAt[kind] = now;
+        toast({ variant: 'error', ...ERROR_TOASTS[kind] });
       },
     }),
     defaultOptions: {
